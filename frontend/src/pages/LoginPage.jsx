@@ -37,7 +37,8 @@ export function LoginPage() {
                 isClosable: true,
                 position: "top",
             });
-            setJWT(result.data.data.token);
+            localStorage.setItem("x-auth-token", result.data.data.token);
+            localStorage.setItem("username", username);
             setUsername("");
             setPassword("");
             navigate("/");
@@ -69,10 +70,6 @@ export function LoginPage() {
             console.log(e);
             return { success: false, error: e };
         }
-    };
-
-    const setJWT = async (token) => {
-        localStorage.setItem("x-auth-token", token);
     };
 
     const formBgColor = useColorModeValue("white", "dark.800");

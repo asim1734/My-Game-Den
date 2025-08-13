@@ -5,6 +5,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const authRouter = require("./routes/auth");
+const gamesRouter = require("./routes/games");
 const authMiddleware = require("./middleware/authMiddleware");
 
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ mongoose
     .catch((err) => console.error("MongoDB connection error:", err));
 
 app.use("/api/auth", authRouter);
+app.use("/api", authMiddleware, gamesRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running at ${PORT}`);

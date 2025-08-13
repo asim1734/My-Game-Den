@@ -35,7 +35,9 @@ const loginUser = async (req, res) => {
                 res.status(200).json({ message: "Login succesful", token });
             }
         );
+        console.log("USer logged in ");
     } catch (e) {
+        console.error(e);
         res.status(500).json({ message: "Server Error" });
     }
 };
@@ -61,6 +63,7 @@ const registerUser = async (req, res) => {
             passwordHash,
         });
         await user.save();
+        console.log("New user registered");
         return res.status(201).json("Registration Succcesful");
     } catch (e) {
         return res.status(500).json({ message: "Server Error" });
