@@ -65,6 +65,7 @@ export function LoginPage() {
                     password,
                 }
             );
+            console.log("User logged in");
             return { success: true, data: res };
         } catch (e) {
             console.log(e);

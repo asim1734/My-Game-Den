@@ -29,7 +29,7 @@ mongoose
     .catch((err) => console.error("MongoDB connection error:", err));
 
 app.use("/api/auth", authRouter);
-app.use("/api", authMiddleware, gamesRouter);
+app.use("/api/games", authMiddleware, gamesRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running at ${PORT}`);

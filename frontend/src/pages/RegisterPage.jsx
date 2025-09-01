@@ -53,6 +53,7 @@ export const RegisterPage = () => {
                 isClosable: true,
                 position: "top",
             });
+            console.log("User registered");
             setUsername("");
             setPassword("");
             setConfirmPassword("");

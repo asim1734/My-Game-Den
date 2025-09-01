@@ -1,3 +1,4 @@
+// src/layouts/RootLayout.jsx
 import { Outlet, Link as RouterLink, useLocation } from "react-router-dom";
 import {
     Box,
@@ -7,18 +8,44 @@ import {
     Spacer,
     useToast,
     Text,
+    HStack,
+    Icon,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { FaGamepad } from "react-icons/fa"; // Gamepad icon for branding
+
+// Helper component for navigation links to handle active styling
+const NavLink = ({ to, children }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+
+    return (
+        <Button
+            as={RouterLink}
+            to={to}
+            variant="ghost"
+            // Apply active styles
+            bg={isActive ? "brand.500" : "transparent"}
+            color={isActive ? "white" : "brand.300"}
+            _hover={{
+                bg: isActive ? "brand.600" : "rgba(128, 90, 213, 0.1)",
+            }}
+            mx="2"
+        >
+            {children}
+        </Button>
+    );
+};
 
 export function RootLayout() {
     const navigate = useNavigate();
     const toast = useToast();
-    const location = useLocation();
 
     const isAuthenticated = localStorage.getItem("x-auth-token");
     const username = localStorage.getItem("username");
 
     const handleLogout = () => {
+        // ... (logout logic remains the same)
         localStorage.removeItem("x-auth-token");
         localStorage.removeItem("username");
         toast({
@@ -32,91 +59,98 @@ export function RootLayout() {
     };
 
     return (
-        <Box>
-            <Flex as="nav" p="4" bg="gray.700" color="white" align="center">
-                <Heading size="md" as={RouterLink} to="/">
-                    My Game Den
-                </Heading>
+        // This structure ensures the footer sticks to the bottom
+        <Flex direction="column" minHeight="100vh">
+            {/* --- Sticky Navbar --- */}
+            <Flex
+                as="nav"
+                p="4"
+                bg="brand.800" // Use brand color
+                align="center"
+                position="sticky"
+                top="0"
+                zIndex="sticky"
+                boxShadow="md"
+            >
+                <HStack
+                    as={RouterLink}
+                    to="/"
+                    spacing="3"
+                    _hover={{ textDecoration: "none" }}
+                >
+                    <Icon as={FaGamepad} boxSize="6" color="brand.500" />
+                    <Heading size="md" color="white">
+                        My Game Den
+                    </Heading>
+                </HStack>
+
                 <Spacer />
 
-                <Flex mx="auto">
-                    <Button
-                        as={RouterLink}
-                        to="/"
-                        variant="ghost"
-                        color="white"
-                        mx="2"
-                    >
-                        Home
-                    </Button>
+                {/* --- Centered Navigation Links --- */}
+                <HStack display={{ base: "none", md: "flex" }}>
+                    <NavLink to="/">Home</NavLink>
                     {isAuthenticated && (
                         <>
-                            <Button
-                                as={RouterLink}
-                                to="/collection"
-                                variant="ghost"
-                                color="white"
-                                mx="2"
-                            >
-                                My Collection
-                            </Button>
-                            <Button
-                                as={RouterLink}
-                                to="/wishlist"
-                                variant="ghost"
-                                color="white"
-                                mx="2"
-                            >
-                                My Wishlist
-                            </Button>
+                            <NavLink to="/collection">My Collection</NavLink>
+                            <NavLink to="/wishlist">My Wishlist</NavLink>
                         </>
                     )}
-                </Flex>
+                </HStack>
 
                 <Spacer />
 
+                {/* --- Authentication Buttons --- */}
                 {isAuthenticated ? (
-                    <Flex align="center">
-                        <Button colorScheme="red" onClick={handleLogout}>
+                    <HStack>
+                        <Text color="gray.400" fontSize="sm">
+                            Welcome, {username}
+                        </Text>
+                        <Button
+                            colorScheme="purple"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleLogout}
+                        >
                             Logout
                         </Button>
-                    </Flex>
+                    </HStack>
                 ) : (
-                    <Flex>
+                    <HStack>
                         <Button
                             as={RouterLink}
                             to="/login"
                             variant="ghost"
-                            mr="4"
-                            color="white"
+                            size="sm"
                         >
                             Login
                         </Button>
                         <Button
                             as={RouterLink}
                             to="/register"
-                            colorScheme="teal"
+                            colorScheme="purple"
+                            size="sm"
                         >
                             Register
                         </Button>
-                    </Flex>
+                    </HStack>
                 )}
             </Flex>
 
-            <Box p="4">
+            {/* --- Main Content Area --- */}
+            <Box p="4" flex="1">
                 <Outlet />
             </Box>
 
+            {/* --- Footer --- */}
             <Box
                 as="footer"
                 p="4"
-                mt="8"
-                bg="gray.800"
+                bg="brand.800" // Use brand color
                 color="gray.400"
                 textAlign="center"
             >
-                © 2025 My Game Den
+                © {new Date().getFullYear()} My Game Den. All rights reserved.
             </Box>
-        </Box>
+        </Flex>
     );
 }
