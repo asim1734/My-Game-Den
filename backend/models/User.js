@@ -1,6 +1,13 @@
-// models/User.js
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
+const listSchema = new Schema(
+    {
+        name: { type: String, required: true },
+        games: { type: [Number], default: [] },
+    },
+    { _id: false }
+);
 
 const userSchema = new Schema(
     {
@@ -22,13 +29,12 @@ const userSchema = new Schema(
             required: true,
             minlength: 8,
         },
-        collection: {
-            type: [Number],
-            default: [],
-        },
-        wishlist: {
-            type: [Number],
-            default: [],
+        lists: {
+            type: [listSchema],
+            default: [
+                { name: "collection", games: [] },
+                { name: "wishlist", games: [] },
+            ],
         },
     },
     {

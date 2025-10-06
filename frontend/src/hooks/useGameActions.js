@@ -1,24 +1,24 @@
+// src/hooks/useGameActions.js
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@chakra-ui/react";
-import { addToCollection, removeFromCollection } from "../api";
+import { addGameToList, removeGameFromList } from "../api";
 
 export const useGameActions = (game) => {
     const toast = useToast();
     const queryClient = useQueryClient();
 
-    // --- ADD MUTATION ---
     const addMutation = useMutation({
-        mutationFn: addToCollection,
-        onSuccess: () => {
+        mutationFn: addGameToList,
+        onSuccess: (data, variables) => {
             toast({
                 title: "Success!",
-                description: `${game.title} has been added to your collection.`,
+                description: `${game.title} has been added to your ${variables.listName}.`,
                 status: "success",
                 duration: 2000,
                 isClosable: true,
                 position: "top",
             });
-            queryClient.invalidateQueries({ queryKey: ["collectionIds"] });
+            queryClient.invalidateQueries({ queryKey: ["userLists"] });
         },
         onError: (error) => {
             toast({
@@ -33,25 +33,35 @@ export const useGameActions = (game) => {
         },
     });
 
-    // --- REMOVE MUTATION (WITH OPTIMISTIC UPDATE) ---
     const removeMutation = useMutation({
-        mutationFn: removeFromCollection,
-        onMutate: async (gameIdToRemove) => {
-            const collectionIds = queryClient.getQueryData(["collectionIds"]);
-            const collectionQueryKey = ["collectionGames", collectionIds];
+        mutationFn: removeGameFromList,
 
-            await queryClient.cancelQueries({ queryKey: collectionQueryKey });
-            const previousGames = queryClient.getQueryData(collectionQueryKey);
-            queryClient.setQueryData(collectionQueryKey, (oldData) =>
+        onMutate: async ({ listName, gameId: gameIdToRemove }) => {
+            // 1. Get the current list of IDs to build the correct query key for the PAGE data.
+            const userLists = queryClient.getQueryData(["userLists"]);
+            const gameIds = userLists?.find((l) => l.name === listName)?.games;
+            const gamesQueryKey = [`${listName}Games`, gameIds];
+
+            // 2. Cancel any outgoing refetches for the page data.
+            await queryClient.cancelQueries({ queryKey: gamesQueryKey });
+
+            // 3. Snapshot the previous page data.
+            const previousGames = queryClient.getQueryData(gamesQueryKey);
+
+            // 4. Optimistically update ONLY the page data.
+            queryClient.setQueryData(gamesQueryKey, (oldData) =>
                 oldData
                     ? oldData.filter((g) => g.igdbId !== gameIdToRemove)
                     : []
             );
-            return { previousGames, collectionQueryKey };
+
+            // 5. Return the context for rollback.
+            return { previousGames, gamesQueryKey };
         },
         onError: (err, variables, context) => {
+            // Roll back the page data on failure.
             queryClient.setQueryData(
-                context.collectionQueryKey,
+                context.gamesQueryKey,
                 context.previousGames
             );
             toast({
@@ -63,22 +73,27 @@ export const useGameActions = (game) => {
                 position: "top",
             });
         },
+        // onSettled: () => {
+        //     // 6. After everything, tell the main list of IDs to sync up in the background.
+        //     // This will NOT cause a spinner.
+        //     queryClient.invalidateQueries({ queryKey: ["userLists"] });
+        // },
     });
 
-    const handleAddToCollection = (e) => {
+    const handleAddGame = (e, listName) => {
         e.preventDefault();
-        addMutation.mutate(game.igdbId);
+        addMutation.mutate({ listName, gameId: game.igdbId });
     };
 
-    const handleRemoveFromCollection = (e) => {
+    const handleRemoveGame = (e, listName) => {
         e.preventDefault();
-        removeMutation.mutate(game.igdbId);
+        removeMutation.mutate({ listName, gameId: game.igdbId });
     };
 
     return {
-        handleAddToCollection,
+        handleAddGame,
         isAdding: addMutation.isPending,
-        handleRemoveFromCollection,
+        handleRemoveGame,
         isRemoving: removeMutation.isPending,
     };
 };

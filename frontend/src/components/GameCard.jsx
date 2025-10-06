@@ -23,12 +23,8 @@ import { Link as RouterLink } from "react-router-dom";
 import { useGameActions } from "../hooks/useGameActions";
 
 const GameCard = ({ game, variant = "dashboard" }) => {
-    const {
-        handleAddToCollection,
-        isAdding,
-        handleRemoveFromCollection,
-        isRemoving,
-    } = useGameActions(game);
+    const { handleAddGame, isAdding, handleRemoveGame, isRemoving } =
+        useGameActions(game);
 
     const getRatingColor = (rating) => {
         if (rating > 85) return "green";
@@ -43,7 +39,6 @@ const GameCard = ({ game, variant = "dashboard" }) => {
     return (
         <LinkBox
             as={Card}
-            // --- STYLING PROPS RESTORED ---
             minWidth="180px"
             borderRadius="lg"
             overflow="hidden"
@@ -85,7 +80,6 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     </Heading>
                 </LinkOverlay>
 
-                {/* --- GENRES AND PLATFORMS JSX RESTORED --- */}
                 <VStack align="start" spacing={1} color="gray.400">
                     {game.genres?.length > 0 && (
                         <HStack spacing={1}>
@@ -109,14 +103,24 @@ const GameCard = ({ game, variant = "dashboard" }) => {
 
                 {variant === "dashboard" && (
                     <ButtonGroup size="sm" spacing="2" width="100%" mt={3}>
-                        <Button variant="outline" colorScheme="teal" flex="1">
+                        <Button
+                            variant="outline"
+                            colorScheme="teal"
+                            flex="1"
+                            onClick={(e) => {
+                                handleAddGame(e, "wishlist");
+                            }}
+                            isLoading={isAdding}
+                        >
                             Wishlist
                         </Button>
                         <Button
                             variant="solid"
                             colorScheme="teal"
                             flex="1"
-                            onClick={handleAddToCollection}
+                            onClick={(e) => {
+                                handleAddGame(e, "collection");
+                            }}
                             isLoading={isAdding}
                         >
                             Collection
@@ -131,7 +135,25 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                         size="sm"
                         width="100%"
                         mt={3}
-                        onClick={handleRemoveFromCollection}
+                        onClick={(e) => {
+                            handleRemoveGame(e, variant);
+                        }}
+                        isLoading={isRemoving}
+                    >
+                        Remove from Collection
+                    </Button>
+                )}
+
+                {variant === "wishlist" && (
+                    <Button
+                        variant="outline"
+                        colorScheme="red"
+                        size="sm"
+                        width="100%"
+                        mt={3}
+                        onClick={(e) => {
+                            handleRemoveGame(e, variant);
+                        }}
                         isLoading={isRemoving}
                     >
                         Remove from Collection

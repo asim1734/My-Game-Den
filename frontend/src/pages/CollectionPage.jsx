@@ -1,5 +1,7 @@
+// src/pages/CollectionPage.jsx
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getCollectionIds, fetchGamesByIds } from "../api";
+import { getAllUserLists, fetchGamesByIds } from "../api";
 import {
     Box,
     Heading,
@@ -11,14 +13,19 @@ import {
 import GameCard from "../components/GameCard";
 
 export const CollectionPage = () => {
-    const { data: collectionIds, isLoading: isLoadingIds } = useQuery({
-        queryKey: ["collectionIds"],
-        queryFn: getCollectionIds,
+    // We destructure 'status' to get more precise loading information
+    const { data: allLists, status: listsStatus } = useQuery({
+        queryKey: ["userLists"],
+        queryFn: getAllUserLists,
     });
+
+    const collectionIds = allLists?.find(
+        (list) => list.name === "collection"
+    )?.games;
 
     const {
         data: collectionGames,
-        isLoading: isLoadingGames,
+        status: gamesStatus,
         isError,
         error,
     } = useQuery({
@@ -27,7 +34,11 @@ export const CollectionPage = () => {
         enabled: !!collectionIds,
     });
 
-    if (isLoadingIds || isLoadingGames) {
+    // This logic correctly shows a spinner ONLY on the initial page load
+    const isInitialLoading =
+        listsStatus === "pending" || gamesStatus === "pending";
+
+    if (isInitialLoading) {
         return (
             <Center minH="calc(100vh - 150px)">
                 <Spinner size="xl" color="brand.500" />
@@ -48,7 +59,6 @@ export const CollectionPage = () => {
     return (
         <Box p={8}>
             <Heading mb={6}>My Collection</Heading>
-
             {collectionGames && collectionGames.length > 0 ? (
                 <SimpleGrid
                     columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}

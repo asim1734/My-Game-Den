@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userController");
-const gameController = require("../controller/gameController");
 
-router.post("/collection", userController.addToCollection);
-router.get("/collection", userController.getCollection);
+router.get("/lists", userController.getAllLists);
 
-router.delete("/collection/:gameId", userController.removeFromCollection);
+router.post("/lists/:listName", userController.addGameToList);
+
+router.delete("/lists/:listName/:gameId", userController.removeGameFromList);
 
 module.exports = router;
