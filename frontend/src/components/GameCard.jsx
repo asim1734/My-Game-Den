@@ -17,16 +17,18 @@ import {
     AspectRatio,
     LinkBox,
     LinkOverlay,
-    useToast,
 } from "@chakra-ui/react";
 import { FaStar, FaCalendarAlt, FaTags, FaDesktop } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addToCollection, removeFromCollection } from "../api";
+import { useGameActions } from "../hooks/useGameActions";
 
 const GameCard = ({ game, variant = "dashboard" }) => {
-    const toast = useToast();
-    const queryClient = useQueryClient();
+    const {
+        handleAddToCollection,
+        isAdding,
+        handleRemoveFromCollection,
+        isRemoving,
+    } = useGameActions(game);
 
     const getRatingColor = (rating) => {
         if (rating > 85) return "green";
@@ -38,63 +40,10 @@ const GameCard = ({ game, variant = "dashboard" }) => {
         ? new Date(game.releaseDate).getFullYear()
         : "N/A";
 
-    const addMutation = useMutation({
-        mutationFn: addToCollection,
-        onSuccess: () => {
-            toast({
-                title: "Success!",
-                description: `${game.title} has been added to your collection.`,
-                status: "success",
-                duration: 2000,
-                isClosable: true,
-                position: "top",
-            });
-            queryClient.invalidateQueries({ queryKey: ["collectionIds"] });
-        },
-        onError: (error) => {
-            toast({
-                title: "Error",
-                description:
-                    error.response?.data?.msg || "You must be logged in.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-                position: "top",
-            });
-        },
-    });
-
-    const removeMutation = useMutation({
-        mutationFn: removeFromCollection,
-        onSuccess: () => {
-            toast({
-                title: "Removed",
-                description: `${game.title} has been removed from your collection.`,
-                status: "info",
-                duration: 2000,
-                isClosable: true,
-                position: "top",
-            });
-            queryClient.invalidateQueries({ queryKey: ["collectionIds"] });
-        },
-        onError: (error) => {
-            /* ... error toast ... */
-        },
-    });
-
-    const handleAddToCollection = (e) => {
-        e.preventDefault();
-        addMutation.mutate(game.igdbId);
-    };
-
-    const handleRemoveFromCollection = (e) => {
-        e.preventDefault();
-        removeMutation.mutate(game.igdbId);
-    };
-
     return (
         <LinkBox
             as={Card}
+            // --- STYLING PROPS RESTORED ---
             minWidth="180px"
             borderRadius="lg"
             overflow="hidden"
@@ -136,6 +85,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     </Heading>
                 </LinkOverlay>
 
+                {/* --- GENRES AND PLATFORMS JSX RESTORED --- */}
                 <VStack align="start" spacing={1} color="gray.400">
                     {game.genres?.length > 0 && (
                         <HStack spacing={1}>
@@ -167,7 +117,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                             colorScheme="teal"
                             flex="1"
                             onClick={handleAddToCollection}
-                            isLoading={addMutation.isPending}
+                            isLoading={isAdding}
                         >
                             Collection
                         </Button>
@@ -182,7 +132,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                         width="100%"
                         mt={3}
                         onClick={handleRemoveFromCollection}
-                        isLoading={removeMutation.isPending}
+                        isLoading={isRemoving}
                     >
                         Remove from Collection
                     </Button>

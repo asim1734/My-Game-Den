@@ -125,14 +125,12 @@ exports.getUpcomingGamesController = async (req, res) => {
 
 exports.getGamesByIdsController = async (req, res) => {
     try {
-        const { ids } = req.body; // Expects an array like { "ids": [119, 1942] }
+        const { ids } = req.body;
 
-        // If no IDs are sent, return an empty array to avoid an error.
         if (!ids || ids.length === 0) {
             return res.json([]);
         }
 
-        // Convert the array of numbers into a comma-separated string for the query.
         const idString = ids.join(",");
 
         const queryString = `

@@ -36,15 +36,30 @@ exports.getCollection = async (req, res) => {
     try {
         console.log("--- RUNNING FINAL FIX with .lean() ---");
 
-        // THE FIX: Add .lean() to the end of the query.
         const user = await User.findById(req.user.id).lean();
 
         if (!user) {
             return res.status(404).json({ msg: "User not found." });
         }
 
-        // Now, user.collection is a plain JavaScript array, which is safe to send.
         res.json(user.collection);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.removeFromCollection = async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const userId = req.user.id;
+
+        await User.updateOne(
+            { _id: userId },
+            { $pull: { collection: gameId } }
+        );
+
+        res.status(200).json({ msg: "Game removed from collection." });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
