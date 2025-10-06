@@ -8,4 +8,6 @@ router.get("/new-releases", gameController.getNewReleasesController);
 
 router.get("/upcoming", gameController.getUpcomingGamesController);
 
+router.post("/by-ids", gameController.getGamesByIdsController);
+
 module.exports = router;

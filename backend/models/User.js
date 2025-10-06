@@ -1,3 +1,4 @@
+// models/User.js
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -21,9 +22,14 @@ const userSchema = new Schema(
             required: true,
             minlength: 8,
         },
-        savedGames: [{}],
-
-        wishlistedGames: [{}],
+        collection: {
+            type: [Number],
+            default: [],
+        },
+        wishlist: {
+            type: [Number],
+            default: [],
+        },
     },
     {
         timestamps: true,

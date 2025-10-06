@@ -15,14 +15,19 @@ import {
     Badge,
     Icon,
     AspectRatio,
-    // NEW: Import LinkBox and LinkOverlay
     LinkBox,
     LinkOverlay,
+    useToast,
 } from "@chakra-ui/react";
 import { FaStar, FaCalendarAlt, FaTags, FaDesktop } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCollection, removeFromCollection } from "../api";
 
-const GameCard = ({ game }) => {
+const GameCard = ({ game, variant = "dashboard" }) => {
+    const toast = useToast();
+    const queryClient = useQueryClient();
+
     const getRatingColor = (rating) => {
         if (rating > 85) return "green";
         if (rating > 70) return "yellow";
@@ -33,9 +38,61 @@ const GameCard = ({ game }) => {
         ? new Date(game.releaseDate).getFullYear()
         : "N/A";
 
+    const addMutation = useMutation({
+        mutationFn: addToCollection,
+        onSuccess: () => {
+            toast({
+                title: "Success!",
+                description: `${game.title} has been added to your collection.`,
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+            });
+            queryClient.invalidateQueries({ queryKey: ["collectionIds"] });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error",
+                description:
+                    error.response?.data?.msg || "You must be logged in.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        },
+    });
+
+    const removeMutation = useMutation({
+        mutationFn: removeFromCollection,
+        onSuccess: () => {
+            toast({
+                title: "Removed",
+                description: `${game.title} has been removed from your collection.`,
+                status: "info",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+            });
+            queryClient.invalidateQueries({ queryKey: ["collectionIds"] });
+        },
+        onError: (error) => {
+            /* ... error toast ... */
+        },
+    });
+
+    const handleAddToCollection = (e) => {
+        e.preventDefault();
+        addMutation.mutate(game.igdbId);
+    };
+
+    const handleRemoveFromCollection = (e) => {
+        e.preventDefault();
+        removeMutation.mutate(game.igdbId);
+    };
+
     return (
-        // THE FIX: Use LinkBox as the main container, rendered as a Card.
-        // This is now the direct child of the Flex container and will stretch properly.
         <LinkBox
             as={Card}
             minWidth="180px"
@@ -48,23 +105,7 @@ const GameCard = ({ game }) => {
             transition="transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out"
         >
             <AspectRatio ratio={3 / 4} width="100%">
-                <Image
-                    src={game.coverUrl}
-                    alt={game.title}
-                    objectFit="cover"
-                    fallback={
-                        <Flex
-                            bg="gray.800"
-                            align="center"
-                            justify="center"
-                            height="100%"
-                        >
-                            <Text color="gray.400" fontSize="sm">
-                                No Cover
-                            </Text>
-                        </Flex>
-                    }
-                />
+                <Image src={game.coverUrl} alt={game.title} objectFit="cover" />
             </AspectRatio>
 
             <CardBody p={3} flex="1" display="flex" flexDirection="column">
@@ -89,7 +130,6 @@ const GameCard = ({ game }) => {
                     </Flex>
                 </HStack>
 
-                {/* THE FIX: The LinkOverlay wraps the heading but makes the whole box linkable. */}
                 <LinkOverlay as={RouterLink} to={`/game/${game.igdbId}`}>
                     <Heading size="sm" noOfLines={2} title={game.title} mb={2}>
                         {game.title}
@@ -117,15 +157,36 @@ const GameCard = ({ game }) => {
 
                 <Spacer />
 
-                {/* REMOVED: The onClick handler is no longer needed, LinkBox handles it. */}
-                <ButtonGroup size="sm" spacing="2" width="100%" mt={3}>
-                    <Button variant="outline" colorScheme="teal" flex="1">
-                        Wishlist
+                {variant === "dashboard" && (
+                    <ButtonGroup size="sm" spacing="2" width="100%" mt={3}>
+                        <Button variant="outline" colorScheme="teal" flex="1">
+                            Wishlist
+                        </Button>
+                        <Button
+                            variant="solid"
+                            colorScheme="teal"
+                            flex="1"
+                            onClick={handleAddToCollection}
+                            isLoading={addMutation.isPending}
+                        >
+                            Collection
+                        </Button>
+                    </ButtonGroup>
+                )}
+
+                {variant === "collection" && (
+                    <Button
+                        variant="outline"
+                        colorScheme="red"
+                        size="sm"
+                        width="100%"
+                        mt={3}
+                        onClick={handleRemoveFromCollection}
+                        isLoading={removeMutation.isPending}
+                    >
+                        Remove from Collection
                     </Button>
-                    <Button variant="solid" colorScheme="teal" flex="1">
-                        Collection
-                    </Button>
-                </ButtonGroup>
+                )}
             </CardBody>
         </LinkBox>
     );

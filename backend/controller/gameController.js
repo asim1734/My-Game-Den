@@ -65,7 +65,12 @@ const fetchGamesFromIGDB = async (igdbQueryString, queryName = "Query") => {
 // --- Specific Game List Functions ---
 
 const getTopGames = () => {
-    const queryString = `fields name, cover.url, genres.name, platforms.name, first_release_date, total_rating; where category = 0 & platforms = (6,48,49,167,130,9) & total_rating_count > 1000 & total_rating > 80; sort total_rating desc; limit 25;`;
+    const queryString = `
+        fields name, cover.url, genres.name, platforms.name, first_release_date, total_rating, total_rating_count;
+        where category = 0 & platforms = (6,48,49,167,130,9) & total_rating_count > 500 & total_rating > 80;
+        sort total_rating_count desc;
+        limit 25;
+    `;
     return fetchGamesFromIGDB(queryString, "Top Games");
 };
 
@@ -115,5 +120,30 @@ exports.getUpcomingGamesController = async (req, res) => {
         res.status(200).json(games);
     } catch (error) {
         res.status(500).json({ message: "Error fetching upcoming games." });
+    }
+};
+
+exports.getGamesByIdsController = async (req, res) => {
+    try {
+        const { ids } = req.body; // Expects an array like { "ids": [119, 1942] }
+
+        // If no IDs are sent, return an empty array to avoid an error.
+        if (!ids || ids.length === 0) {
+            return res.json([]);
+        }
+
+        // Convert the array of numbers into a comma-separated string for the query.
+        const idString = ids.join(",");
+
+        const queryString = `
+            fields name, cover.url, genres.name, platforms.name, first_release_date, total_rating, total_rating_count;
+            where id = (${idString});
+            limit ${ids.length};
+        `;
+
+        const games = await fetchGamesFromIGDB(queryString, "Games By IDs");
+        res.status(200).json(games);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching games by IDs." });
     }
 };
