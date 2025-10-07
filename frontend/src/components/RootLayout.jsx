@@ -91,8 +91,10 @@ export function RootLayout() {
                     <NavLink to="/">Home</NavLink>
                     {isAuthenticated && (
                         <>
-                            <NavLink to="/collection">My Collection</NavLink>
-                            <NavLink to="/wishlist">My Wishlist</NavLink>
+                            <NavLink to="/lists/collection">
+                                My Collection
+                            </NavLink>
+                            <NavLink to="/lists/wishlist">My Wishlist</NavLink>
                         </>
                     )}
                 </HStack>

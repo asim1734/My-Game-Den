@@ -1,5 +1,4 @@
-// src/pages/WishlistPage.jsx
-import React from "react";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUserLists, fetchGamesByIds } from "../api";
 import {
@@ -12,28 +11,33 @@ import {
 } from "@chakra-ui/react";
 import GameCard from "../components/GameCard";
 
-export const WishlistPage = () => {
-    const { data: allLists, isLoading: isLoadingLists } = useQuery({
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+export const UserListPage = () => {
+    const { listName } = useParams();
+
+    const { data: allLists, status: listsStatus } = useQuery({
         queryKey: ["userLists"],
         queryFn: getAllUserLists,
     });
 
-    const wishlistIds = allLists?.find(
-        (list) => list.name === "wishlist"
-    )?.games;
+    const listIds = allLists?.find((list) => list.name === listName)?.games;
 
     const {
-        data: wishlistGames,
-        isLoading: isLoadingGames,
+        data: listGames,
+        status: gamesStatus,
         isError,
         error,
     } = useQuery({
-        queryKey: ["wishlistGames", wishlistIds],
-        queryFn: () => fetchGamesByIds(wishlistIds),
-        enabled: !!wishlistIds,
+        queryKey: [`${listName}Games`, listIds],
+        queryFn: () => fetchGamesByIds(listIds),
+        enabled: !!listIds,
     });
 
-    if (isLoadingLists || isLoadingGames) {
+    const isInitialLoading =
+        listsStatus === "pending" || gamesStatus === "pending";
+
+    if (isInitialLoading) {
         return (
             <Center minH="calc(100vh - 150px)">
                 <Spinner size="xl" color="brand.500" />
@@ -53,17 +57,18 @@ export const WishlistPage = () => {
 
     return (
         <Box p={8}>
-            <Heading mb={6}>My Wishlist</Heading>
-            {wishlistGames && wishlistGames.length > 0 ? (
+            <Heading mb={6}>My {capitalize(listName)}</Heading>
+
+            {listGames && listGames.length > 0 ? (
                 <SimpleGrid
                     columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
                     spacing={6}
                 >
-                    {wishlistGames.map((game) => (
+                    {listGames.map((game) => (
                         <GameCard
                             key={game.igdbId}
                             game={game}
-                            variant="wishlist"
+                            variant={listName}
                         />
                     ))}
                 </SimpleGrid>
@@ -74,7 +79,7 @@ export const WishlistPage = () => {
                     borderColor="gray.700"
                     borderRadius="md"
                 >
-                    <Text>Your wishlist is empty. Start adding games!</Text>
+                    <Text>Your {listName} is empty. Start adding games!</Text>
                 </Center>
             )}
         </Box>

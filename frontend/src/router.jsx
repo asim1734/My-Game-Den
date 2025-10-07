@@ -5,8 +5,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ErrorPage } from "./pages/ErrorPage";
-import { CollectionPage } from "./pages/CollectionPage";
-import { WishlistPage } from "./pages/WishlistPage";
+import { UserListPage } from "./pages/UserListPage";
 
 const router = createBrowserRouter([
     {
@@ -27,12 +26,8 @@ const router = createBrowserRouter([
                 element: <RegisterPage />,
             },
             {
-                path: "collection",
-                element: <CollectionPage />,
-            },
-            {
-                path: "wishlist",
-                element: <WishlistPage />,
+                path: "lists/:listName",
+                element: <UserListPage />,
             },
         ],
     },
