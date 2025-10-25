@@ -46,3 +46,9 @@ export const removeGameFromList = async ({ listName, gameId }) => {
     );
     return data;
 };
+
+export const fetchGameById = async (gameId) => {
+    if (!gameId) return null;
+    const { data } = await axios.get(`${API_BASE_URL}/games/${gameId}`);
+    return data;
+};

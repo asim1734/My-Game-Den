@@ -6,6 +6,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { UserListPage } from "./pages/UserListPage";
+import { GameDetailsPage } from "./pages/GameDetialsPage";
 
 const router = createBrowserRouter([
     {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
             {
                 path: "lists/:listName",
                 element: <UserListPage />,
+            },
+            {
+                path: "game/:id",
+                element: <GameDetailsPage />,
             },
         ],
     },

@@ -22,6 +22,8 @@ import { FaStar, FaCalendarAlt, FaTags, FaDesktop } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import { useGameActions } from "../hooks/useGameActions";
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 const GameCard = ({ game, variant = "dashboard" }) => {
     const { handleAddGame, isAdding, handleRemoveGame, isRemoving } =
         useGameActions(game);
@@ -128,7 +130,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     </ButtonGroup>
                 )}
 
-                {variant === "collection" && (
+                {variant !== "dashboard" && (
                     <Button
                         variant="outline"
                         colorScheme="red"
@@ -140,23 +142,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                         }}
                         isLoading={isRemoving}
                     >
-                        Remove from Collection
-                    </Button>
-                )}
-
-                {variant === "wishlist" && (
-                    <Button
-                        variant="outline"
-                        colorScheme="red"
-                        size="sm"
-                        width="100%"
-                        mt={3}
-                        onClick={(e) => {
-                            handleRemoveGame(e, variant);
-                        }}
-                        isLoading={isRemoving}
-                    >
-                        Remove from Collection
+                        Remove from {capitalize(variant)}
                     </Button>
                 )}
             </CardBody>
