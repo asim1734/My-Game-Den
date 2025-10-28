@@ -52,3 +52,14 @@ export const fetchGameById = async (gameId) => {
     const { data } = await axios.get(`${API_BASE_URL}/games/${gameId}`);
     return data;
 };
+
+export const searchGames = async (searchTerm) => {
+    // Only search if the term is not empty
+    if (!searchTerm || searchTerm.trim() === "") {
+        return [];
+    }
+    const { data } = await axios.get(`${API_BASE_URL}/games/search`, {
+        params: { term: searchTerm }, // Send search term as a query parameter
+    });
+    return data;
+};

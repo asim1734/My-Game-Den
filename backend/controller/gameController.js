@@ -187,3 +187,44 @@ exports.getGameById = async (req, res) => {
         res.status(500).json({ message: "Error fetching game details." });
     }
 };
+
+exports.searchGames = async (req, res) => {
+    try {
+        const searchTerm = req.query.term;
+        if (!searchTerm) {
+            /* ... handle error ... */
+        }
+
+        const queryString = `
+            search "${searchTerm}";
+            fields name, cover.url, first_release_date, total_rating;
+            where cover != null;
+            limit 50;
+        `; // Simplified query, ensure semicolon at end
+
+        console.log(
+            "Sending Simplified Search Query:",
+            queryString.replace(/\s+/g, " ").trim()
+        );
+
+        const rawGames = await fetchFromIGDB(
+            "games",
+            queryString,
+            `Search: ${searchTerm}`
+        );
+
+        // --- ADD THIS LOG ---
+        console.log(
+            "Raw games received from IGDB:",
+            JSON.stringify(rawGames, null, 2)
+        );
+
+        // Filter for covers *here* instead of in fetchFromIGDB if needed
+        const gamesWithCovers = rawGames.filter((g) => g.cover);
+
+        res.status(200).json(gamesWithCovers.map(mapGameData));
+    } catch (error) {
+        console.error("Error details in searchGames:", error);
+        res.status(500).json({ message: "Error searching games." });
+    }
+};

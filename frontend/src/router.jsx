@@ -7,6 +7,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { UserListPage } from "./pages/UserListPage";
 import { GameDetailsPage } from "./pages/GameDetialsPage";
+import { SearchResultsPage } from "./pages/SearchResultPage";
 
 const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
             {
                 path: "game/:id",
                 element: <GameDetailsPage />,
+            },
+            {
+                path: "search/:searchTerm",
+                element: <SearchResultsPage />,
             },
         ],
     },
