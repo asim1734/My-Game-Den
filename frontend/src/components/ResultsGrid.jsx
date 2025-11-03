@@ -1,4 +1,3 @@
-// src/components/ResultsGrid.jsx
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { browseGames } from "../api";
@@ -7,13 +6,15 @@ import {
     Heading,
     SimpleGrid,
     Center,
-    Spinner,
+    Spinner, // Spinner is no longer used for loading, but might be for other features
     Text,
     Flex,
     Select,
     Spacer,
 } from "@chakra-ui/react";
 import GameCard from "../components/GameCard";
+// 1. IMPORT THE SKELETON
+import GameCardSkeleton from "../components/GameCardSkeleton";
 
 const sortOptions = {
     Popularity: "total_rating_count",
@@ -23,7 +24,6 @@ const sortOptions = {
 };
 
 export const ResultsGrid = ({ filters, onSortChange }) => {
-    // This query fetches the data based on the filters passed as props
     const {
         data: games,
         isLoading,
@@ -34,6 +34,9 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
         queryFn: () => browseGames(filters),
     });
 
+    // 2. DEFINE A SKELETONS ARRAY
+    const skeletons = Array(12).fill(0); // 12 is a good default for a grid
+
     return (
         <Box>
             <Flex
@@ -42,6 +45,7 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
                 mb={6}
                 align="center"
             >
+                {/* ... (Your Flex header with Heading and Selects is unchanged) ... */}
                 <Heading size="lg">Browse</Heading>
                 <Spacer />
                 <Select
@@ -65,10 +69,16 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
                 </Select>
             </Flex>
 
+            {/* 3. REPLACED THE SPINNER WITH THE SKELETON GRID */}
             {isLoading && (
-                <Center minH="400px">
-                    <Spinner size="xl" color="brand.500" />
-                </Center>
+                <SimpleGrid
+                    columns={{ base: 1, sm: 2, md: 3, xl: 4 }}
+                    spacing={6}
+                >
+                    {skeletons.map((_, index) => (
+                        <GameCardSkeleton key={index} />
+                    ))}
+                </SimpleGrid>
             )}
 
             {isError && (
@@ -89,6 +99,7 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
                         ))}
                     </SimpleGrid>
                 ) : (
+                    // This is your empty state, which looks great!
                     <Center
                         minH="400px"
                         borderWidth="1px"
@@ -101,7 +112,6 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
                         </Text>
                     </Center>
                 ))}
-            {/* Pagination controls would go here */}
         </Box>
     );
 };

@@ -1,11 +1,10 @@
-// src/components/RootLayout.jsx
-import React, { useState, useEffect } from "react"; // Import useState, useEffect
+import React, { useState, useEffect } from "react";
 import {
     Outlet,
     Link as RouterLink,
     useLocation,
     useNavigate,
-} from "react-router-dom"; // Import useNavigate
+} from "react-router-dom";
 import {
     Box,
     Flex,
@@ -15,12 +14,15 @@ import {
     useToast,
     Text,
     HStack,
-    Icon,
-    Input, // Import Input component
+    Image,
+    Input,
+    InputGroup, // NEW: Import InputGroup
+    InputLeftElement, // NEW: Import InputLeftElement
 } from "@chakra-ui/react";
-import { FaGamepad } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa"; // NEW: Import the search icon
 
-// Helper component for navigation links
+// --- CHANGED: NavLink Helper ---
+// We'll change the active style from a 'bg' to a 'borderBottom'
 const NavLink = ({ to, children }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -29,12 +31,12 @@ const NavLink = ({ to, children }) => {
         <Button
             as={RouterLink}
             to={to}
-            variant="ghost"
-            bg={isActive ? "brand.500" : "transparent"}
-            color={isActive ? "white" : "brand.300"}
-            _hover={{
-                bg: isActive ? "brand.600" : "rgba(128, 90, 213, 0.1)",
-            }}
+            variant="ghost" // This will use our theme's ghost variant hover
+            color="brand.300"
+            // NEW: Clean underline style for active link
+            borderBottom="2px solid"
+            borderColor={isActive ? "brand.500" : "transparent"}
+            borderRadius="0" // Makes the underline look sharp
             mx="2"
         >
             {children}
@@ -45,31 +47,26 @@ const NavLink = ({ to, children }) => {
 export function RootLayout() {
     const navigate = useNavigate();
     const toast = useToast();
-    const location = useLocation(); // Keep location for NavLink
+    const location = useLocation();
 
     const isAuthenticated = localStorage.getItem("x-auth-token");
     const username = localStorage.getItem("username");
 
-    // --- State for search input ---
     const [searchTerm, setSearchTerm] = useState("");
 
+    // ... (Your useEffect hooks for search and logout logic are unchanged) ...
     // --- Debounce effect for search ---
     useEffect(() => {
-        // Don't navigate if search term is short or empty
         if (!searchTerm || searchTerm.trim().length < 2) {
             return;
         }
-
         const debounceTimer = setTimeout(() => {
-            // Navigate to search results page
             navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
-        }, 500); // 500ms delay
-
-        // Cleanup: clear timer if user types again
+        }, 500);
         return () => clearTimeout(debounceTimer);
     }, [searchTerm, navigate]);
 
-    // --- Clear search term when navigating away from search results ---
+    // --- Clear search term when navigating away ---
     useEffect(() => {
         if (!location.pathname.startsWith("/search/")) {
             setSearchTerm("");
@@ -99,22 +96,18 @@ export function RootLayout() {
                 position="sticky"
                 top="0"
                 zIndex="sticky"
-                boxShadow="md"
+                // NEW: Replaced boxShadow with a subtle borderBottom
+                borderBottom="1px solid"
+                borderColor="brand.700"
             >
                 {/* Logo/Brand */}
-                <HStack
-                    as={RouterLink}
-                    to="/"
-                    spacing="3"
-                    _hover={{ textDecoration: "none" }}
-                >
-                    <Icon as={FaGamepad} boxSize="6" color="brand.500" />
-                    <Heading size="md" color="white">
-                        My Game Den
-                    </Heading>
-                </HStack>
+                <Image
+                    src="/MyGameDenLogo.png" // Make sure this is your transparent logo
+                    alt="My Game Den Logo"
+                    h="55px"
+                    mr={2}
+                />
 
-                {/* Spacer pushes center content */}
                 <Spacer />
 
                 {/* --- Centered Search Bar & Links --- */}
@@ -124,23 +117,34 @@ export function RootLayout() {
                     spacing="4"
                     mx={4}
                 >
-                    {/* Search Input */}
-                    <Input
-                        placeholder="Search games..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        variant="filled"
+                    {/* NEW: Updated Search Input with Icon */}
+                    <InputGroup
                         size="sm"
                         w={{ base: "150px", sm: "200px", md: "300px" }}
-                        bg="brand.900"
-                        color="brand.300"
-                        _hover={{ bg: "brand.700" }}
-                        _focus={{ bg: "brand.700", borderColor: "brand.500" }}
-                    />
+                    >
+                        <InputLeftElement
+                            pointerEvents="none"
+                            children={<FaSearch color="gray.500" />}
+                        />
+                        <Input
+                            placeholder="Search games..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            variant="filled"
+                            bg="brand.900"
+                            color="brand.300"
+                            _hover={{ bg: "brand.700" }}
+                            _focus={{
+                                bg: "brand.700",
+                                borderColor: "brand.500",
+                            }}
+                            pl="2.5rem" // Add padding for the icon
+                        />
+                    </InputGroup>
+
+                    {/* These NavLinks will now use the new style */}
                     <NavLink to="/browse">Browse</NavLink>
                     <HStack display={{ base: "none", lg: "flex" }}>
-                        {" "}
-                        {/* Hide links earlier */}
                         <NavLink to="/">Home</NavLink>
                         {isAuthenticated && (
                             <>
@@ -153,10 +157,10 @@ export function RootLayout() {
                     </HStack>
                 </HStack>
 
-                {/* Spacer pushes auth buttons right */}
                 <Spacer />
 
                 {/* --- Authentication Buttons --- */}
+                {/* ... (This whole HStack is unchanged) ... */}
                 <HStack>
                     {isAuthenticated ? (
                         <>
@@ -169,7 +173,7 @@ export function RootLayout() {
                                 Welcome, {username}
                             </Text>
                             <Button
-                                colorScheme="purple"
+                                colorScheme="purple" // This should use brand colors
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
@@ -190,7 +194,7 @@ export function RootLayout() {
                             <Button
                                 as={RouterLink}
                                 to="/register"
-                                colorScheme="purple"
+                                colorScheme="purple" // This will use brand.500
                                 size="sm"
                             >
                                 Register

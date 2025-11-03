@@ -2,6 +2,7 @@ import axios from "axios";
 import { Box, Flex, Heading, Text, Center, Spinner } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import GameCard from "../components/GameCard";
+import GameCardSkeleton from "../components/GameCardSkeleton";
 import { fetchTopGames, fetchNewReleases, fetchUpcomingGames } from "../api";
 
 const GameRow = ({ title, queryKey, fetcher }) => {
@@ -16,14 +17,20 @@ const GameRow = ({ title, queryKey, fetcher }) => {
         staleTime: 1000 * 60 * 10,
     });
 
+    const skeletons = Array(10).fill(0);
+
     return (
         <Box my={8}>
             <Heading mb={4}>{title}</Heading>
 
             {isLoading && (
-                <Center p={10}>
-                    <Spinner size="xl" color="brand.500" />
-                </Center>
+                <Box overflowX="auto" pb={4}>
+                    <Flex gap={4} flexWrap="nowrap">
+                        {skeletons.map((_, index) => (
+                            <GameCardSkeleton key={index} />
+                        ))}
+                    </Flex>
+                </Box>
             )}
 
             {isError && (
@@ -46,6 +53,7 @@ const GameRow = ({ title, queryKey, fetcher }) => {
         </Box>
     );
 };
+
 export const DashboardPage = () => {
     return (
         <Box p={8}>
