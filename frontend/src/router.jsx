@@ -6,8 +6,9 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { UserListPage } from "./pages/UserListPage";
-import { GameDetailsPage } from "./pages/GameDetialsPage";
+import { GameDetailsPage } from "./pages/GameDetailsPage";
 import { SearchResultsPage } from "./pages/SearchResultPage";
+import { BrowsePage } from "./pages/BrowsePage";
 
 const router = createBrowserRouter([
     {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
             {
                 path: "search/:searchTerm",
                 element: <SearchResultsPage />,
+            },
+            {
+                path: "browse",
+                element: <BrowsePage />,
             },
         ],
     },

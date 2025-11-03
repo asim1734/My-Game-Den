@@ -54,12 +54,40 @@ export const fetchGameById = async (gameId) => {
 };
 
 export const searchGames = async (searchTerm) => {
-    // Only search if the term is not empty
     if (!searchTerm || searchTerm.trim() === "") {
         return [];
     }
     const { data } = await axios.get(`${API_BASE_URL}/games/search`, {
-        params: { term: searchTerm }, // Send search term as a query parameter
+        params: { term: searchTerm },
+    });
+    return data;
+};
+
+export const browseGames = async (filters) => {
+    const params = {
+        page: filters.page,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+    };
+
+    if (filters.genre && filters.genre.length > 0) {
+        params.genre = filters.genre.join(",");
+    }
+    if (filters.platform && filters.platform.length > 0) {
+        params.platform = filters.platform.join(",");
+    }
+    if (filters.minRating) {
+        params.minRating = filters.minRating;
+    }
+    if (filters.releaseYearStart) {
+        params.releaseYearStart = filters.releaseYearStart;
+    }
+    if (filters.releaseYearEnd) {
+        params.releaseYearEnd = filters.releaseYearEnd;
+    }
+
+    const { data } = await axios.get(`${API_BASE_URL}/games/browse`, {
+        params,
     });
     return data;
 };

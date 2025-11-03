@@ -131,13 +131,13 @@ export function RootLayout() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         variant="filled"
                         size="sm"
-                        w={{ base: "150px", sm: "200px", md: "300px" }} // Responsive width
+                        w={{ base: "150px", sm: "200px", md: "300px" }}
                         bg="brand.900"
                         color="brand.300"
                         _hover={{ bg: "brand.700" }}
                         _focus={{ bg: "brand.700", borderColor: "brand.500" }}
                     />
-                    {/* Navigation Links (Hidden on small screens if search takes up space) */}
+                    <NavLink to="/browse">Browse</NavLink>
                     <HStack display={{ base: "none", lg: "flex" }}>
                         {" "}
                         {/* Hide links earlier */}

@@ -27,7 +27,7 @@ const loginUser = async (req, res) => {
         jwt.sign(
             payload,
             process.env.JWT_ACCESS_TOKEN,
-            { expiresIn: "3h" },
+            { expiresIn: "48h" },
             (err, token) => {
                 if (err) {
                     throw err;

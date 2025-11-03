@@ -6,6 +6,7 @@ router.get("/top-games", gameController.getTopGames);
 router.get("/new-releases", gameController.getNewReleases);
 router.get("/upcoming", gameController.getUpcomingGames);
 router.get("/search", gameController.searchGames);
+router.get("/browse", gameController.browseGames);
 router.get("/:id", gameController.getGameById);
 
 router.post("/by-ids", gameController.getGamesByIds);
