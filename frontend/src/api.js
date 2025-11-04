@@ -27,25 +27,59 @@ export const fetchGamesByIds = async (ids) => {
 
 // --- Generic User List Functions ---
 
+// GET /api/users/lists
 export const getAllUserLists = async () => {
     const { data } = await axios.get(`${API_BASE_URL}/users/lists`);
     return data;
 };
 
+// --- NEW: List Management ---
+
+// POST /api/users/lists
+export const createList = async (listName) => {
+    const { data } = await axios.post(`${API_BASE_URL}/users/lists`, {
+        name: listName,
+    });
+    return data;
+};
+
+// PUT /api/users/lists/:listName
+export const renameList = async (listName, newName) => {
+    const { data } = await axios.put(
+        `${API_BASE_URL}/users/lists/${listName}`,
+        { newName }
+    );
+    return data;
+};
+
+// DELETE /api/users/lists/:listName
+export const deleteList = async (listName) => {
+    const { data } = await axios.delete(
+        `${API_BASE_URL}/users/lists/${listName}`
+    );
+    return data;
+};
+
+// --- CHANGED: Game-in-List Management ---
+
+// POST /api/users/lists/:listName/games
 export const addGameToList = async ({ listName, gameId }) => {
     const { data } = await axios.post(
-        `${API_BASE_URL}/users/lists/${listName}`,
+        `${API_BASE_URL}/users/lists/${listName}/games`,
         { gameId }
     );
     return data;
 };
 
+// DELETE /api/users/lists/:listName/games/:gameId
 export const removeGameFromList = async ({ listName, gameId }) => {
     const { data } = await axios.delete(
-        `${API_BASE_URL}/users/lists/${listName}/${gameId}`
+        `${API_BASE_URL}/users/lists/${listName}/games/${gameId}`
     );
     return data;
 };
+
+// --- Other Game Fetchers ---
 
 export const fetchGameById = async (gameId) => {
     if (!gameId) return null;

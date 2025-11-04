@@ -148,10 +148,8 @@ export function RootLayout() {
                         <NavLink to="/">Home</NavLink>
                         {isAuthenticated && (
                             <>
-                                <NavLink to="/lists/collection">
-                                    Collection
-                                </NavLink>
-                                <NavLink to="/lists/wishlist">Wishlist</NavLink>
+                                {/* --- UPDATED: Only "My Lists" is here --- */}
+                                <NavLink to="/my-lists">My Lists</NavLink>
                             </>
                         )}
                     </HStack>

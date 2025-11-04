@@ -9,6 +9,8 @@ import { UserListPage } from "./pages/UserListPage";
 import { GameDetailsPage } from "./pages/GameDetailsPage";
 import { SearchResultsPage } from "./pages/SearchResultPage";
 import { BrowsePage } from "./pages/BrowsePage";
+// NEW: Import the MyListsPage
+import { MyListsPage } from "./pages/MyListsPage";
 
 const router = createBrowserRouter([
     {
@@ -27,6 +29,11 @@ const router = createBrowserRouter([
             {
                 path: "register",
                 element: <RegisterPage />,
+            },
+            // NEW: Add route for My Lists page
+            {
+                path: "my-lists",
+                element: <MyListsPage />,
             },
             {
                 path: "lists/:listName",
