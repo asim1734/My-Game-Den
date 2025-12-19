@@ -9,7 +9,7 @@ import { UserListPage } from "./pages/UserListPage";
 import { GameDetailsPage } from "./pages/GameDetailsPage";
 import { SearchResultsPage } from "./pages/SearchResultPage";
 import { BrowsePage } from "./pages/BrowsePage";
-// NEW: Import the MyListsPage
+import { MyReviewsPage } from "./pages/MyReviewsPage";
 import { MyListsPage } from "./pages/MyListsPage";
 
 const router = createBrowserRouter([
@@ -51,6 +51,10 @@ const router = createBrowserRouter([
                 path: "browse",
                 element: <BrowsePage />,
             },
+            {
+                path: "my-reviews",
+                element: <MyReviewsPage/>
+            }
         ],
     },
     {

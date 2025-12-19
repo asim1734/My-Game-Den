@@ -16,13 +16,11 @@ import {
     HStack,
     Image,
     Input,
-    InputGroup, // NEW: Import InputGroup
-    InputLeftElement, // NEW: Import InputLeftElement
+    InputGroup, 
+    InputLeftElement, 
 } from "@chakra-ui/react";
-import { FaSearch } from "react-icons/fa"; // NEW: Import the search icon
+import { FaSearch } from "react-icons/fa"; 
 
-// --- CHANGED: NavLink Helper ---
-// We'll change the active style from a 'bg' to a 'borderBottom'
 const NavLink = ({ to, children }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -31,12 +29,11 @@ const NavLink = ({ to, children }) => {
         <Button
             as={RouterLink}
             to={to}
-            variant="ghost" // This will use our theme's ghost variant hover
+            variant="ghost" 
             color="brand.300"
-            // NEW: Clean underline style for active link
             borderBottom="2px solid"
             borderColor={isActive ? "brand.500" : "transparent"}
-            borderRadius="0" // Makes the underline look sharp
+            borderRadius="0" 
             mx="2"
         >
             {children}
@@ -54,8 +51,6 @@ export function RootLayout() {
 
     const [searchTerm, setSearchTerm] = useState("");
 
-    // ... (Your useEffect hooks for search and logout logic are unchanged) ...
-    // --- Debounce effect for search ---
     useEffect(() => {
         if (!searchTerm || searchTerm.trim().length < 2) {
             return;
@@ -96,13 +91,12 @@ export function RootLayout() {
                 position="sticky"
                 top="0"
                 zIndex="sticky"
-                // NEW: Replaced boxShadow with a subtle borderBottom
                 borderBottom="1px solid"
                 borderColor="brand.700"
             >
                 {/* Logo/Brand */}
                 <Image
-                    src="/MyGameDenLogo.png" // Make sure this is your transparent logo
+                    src="/MyGameDenLogo.png"
                     alt="My Game Den Logo"
                     h="55px"
                     mr={2}
@@ -110,14 +104,12 @@ export function RootLayout() {
 
                 <Spacer />
 
-                {/* --- Centered Search Bar & Links --- */}
                 <HStack
                     flex={{ base: 1, md: "none" }}
                     justify="center"
                     spacing="4"
                     mx={4}
                 >
-                    {/* NEW: Updated Search Input with Icon */}
                     <InputGroup
                         size="sm"
                         w={{ base: "150px", sm: "200px", md: "300px" }}
@@ -138,17 +130,16 @@ export function RootLayout() {
                                 bg: "brand.700",
                                 borderColor: "brand.500",
                             }}
-                            pl="2.5rem" // Add padding for the icon
+                            pl="2.5rem" 
                         />
                     </InputGroup>
 
-                    {/* These NavLinks will now use the new style */}
                     <NavLink to="/browse">Browse</NavLink>
                     <HStack display={{ base: "none", lg: "flex" }}>
                         <NavLink to="/">Home</NavLink>
                         {isAuthenticated && (
                             <>
-                                {/* --- UPDATED: Only "My Lists" is here --- */}
+
                                 <NavLink to="/my-lists">My Lists</NavLink>
                             </>
                         )}
@@ -158,7 +149,6 @@ export function RootLayout() {
                 <Spacer />
 
                 {/* --- Authentication Buttons --- */}
-                {/* ... (This whole HStack is unchanged) ... */}
                 <HStack>
                     {isAuthenticated ? (
                         <>
@@ -171,7 +161,7 @@ export function RootLayout() {
                                 Welcome, {username}
                             </Text>
                             <Button
-                                colorScheme="purple" // This should use brand colors
+                                colorScheme="purple" 
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
@@ -192,7 +182,7 @@ export function RootLayout() {
                             <Button
                                 as={RouterLink}
                                 to="/register"
-                                colorScheme="purple" // This will use brand.500
+                                colorScheme="purple" 
                                 size="sm"
                             >
                                 Register

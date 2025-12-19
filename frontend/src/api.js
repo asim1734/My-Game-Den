@@ -125,3 +125,33 @@ export const browseGames = async (filters) => {
     });
     return data;
 };
+
+export const fetchUserReviewForGame = async (gameId) => {
+    const { data } = await axios.get(`${API_BASE_URL}/reviews/game/${gameId}`);
+    return data;
+};
+
+export const submitReview = async (reviewData) => {
+    const { data } = await axios.post(`${API_BASE_URL}/reviews`, reviewData);
+    return data;
+};
+
+export const deleteReview = async (gameId) => {
+    const { data } = await axios.delete(`${API_BASE_URL}/reviews/game/${gameId}`);
+    return data;
+};
+
+export const getMyReviews = async () => {
+    const { data } = await axios.get(`${API_BASE_URL}/reviews/my-reviews`);
+    return data;
+};
+
+export const fetchCommunityReviewsForGame = async (gameId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/reviews/community/${gameId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error in fetchCommunityReviewsForGame API call:", error);
+        throw error;
+    }
+};

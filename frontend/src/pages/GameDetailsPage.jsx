@@ -23,9 +23,11 @@ import {
     MenuList,
     MenuItem,
 } from "@chakra-ui/react";
-import { FaChevronDown, FaStar } from "react-icons/fa"; // <-- ADD FaLink HERE
+import { FaChevronDown, FaStar } from "react-icons/fa"; 
 import { useGameActions } from "../hooks/useGameActions";
 import { StoreLink } from "../components/StoreLink";
+import { ReviewSection } from "../components/ReviewSection";
+import { CommunityReviews } from "../components/CommunityReviews";
 
 export const GameDetailsPage = () => {
     const { id: gameId } = useParams();
@@ -165,6 +167,11 @@ export const GameDetailsPage = () => {
                                 </MenuList>
                             </Menu>
                         )}
+
+                        <ReviewSection game={game} />
+
+                        <CommunityReviews gameId={game.igdbId} />
+                        
                         {/* --- Website Links --- */}
                         <Box pt={4}>
                             {" "}

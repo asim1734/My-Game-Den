@@ -7,6 +7,7 @@ require("dotenv").config();
 const authRouter = require("./routes/auth");
 const gamesRouter = require("./routes/games");
 const userRouter = require("./routes/user");
+const reviewRouter = require("./routes/review");
 const authMiddleware = require("./middleware/authMiddleware");
 
 const PORT = process.env.PORT || 3000;
@@ -32,6 +33,7 @@ mongoose
 app.use("/api/auth", authRouter);
 app.use("/api/games", authMiddleware, gamesRouter);
 app.use("/api/users", authMiddleware, userRouter);
+app.use("/api/reviews",authMiddleware, reviewRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running at ${PORT}`);
