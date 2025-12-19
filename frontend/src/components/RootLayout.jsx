@@ -94,12 +94,20 @@ export function RootLayout() {
                 borderColor="brand.700"
             >
                 {/* Logo/Brand */}
-                <Image
-                    src="/MyGameDenLogo.png"
-                    alt="My Game Den Logo"
-                    h="55px"
-                    mr={2}
-                />
+                <Box 
+                    as={RouterLink} 
+                    to="/" 
+                    transition="opacity 0.2s" 
+                    _hover={{ opacity: 0.8 }}
+                >
+                    <Image
+                        src="/MyGameDenLogo.png"
+                        alt="My Game Den Logo"
+                        h="55px"
+                        mr={2}
+                        cursor="pointer"
+                    />
+                </Box>
 
                 <Spacer />
 
