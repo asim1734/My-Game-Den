@@ -13,14 +13,15 @@ import {
     useColorModeValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+// Updated: Import the centralized api instance instead of raw axios
+import api from "../api"; 
+
 export const RegisterPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [res, setRes] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
     const handleShowClick = () => setShowPassword(!showPassword);
@@ -31,7 +32,7 @@ export const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (password != confirmPassword) {
+        if (password !== confirmPassword) {
             toast({
                 title: "Passwords Do not match",
                 description: "Enter the same password again",
@@ -53,17 +54,17 @@ export const RegisterPage = () => {
                 isClosable: true,
                 position: "top",
             });
-            console.log("User registered");
             setUsername("");
             setPassword("");
             setConfirmPassword("");
             setEmail("");
             navigate("/login");
         } else {
+            // Improved error handling for production
             const errorMessage =
-                result.error.response.data.message ||
-                "An unexpected error occurred.";
-            console.log(result);
+                result.error.response?.data?.message ||
+                "Could not connect to the server. Please try again later.";
+            
             toast({
                 title: errorMessage,
                 status: "error",
@@ -76,22 +77,20 @@ export const RegisterPage = () => {
 
     const registerUser = async () => {
         try {
-            const response = await axios.post(
-                "http://localhost:3000/api/auth/register",
-                {
-                    username,
-                    password,
-                    email,
-                }
-            );
+            // Updated: Using the api instance with a relative path
+            const response = await api.post("/auth/register", {
+                username,
+                password,
+                email,
+            });
             return { success: true, data: response.data };
         } catch (e) {
             return { success: false, error: e };
         }
     };
 
-    const formBgColor = useColorModeValue("white", "dark.800");
-    const pageBgColor = useColorModeValue("gray.50", "dark.900");
+    const formBgColor = useColorModeValue("white", "gray.800");
+    const pageBgColor = useColorModeValue("gray.50", "gray.900");
 
     return (
         <Box
@@ -116,53 +115,31 @@ export const RegisterPage = () => {
                         size="xl"
                         textAlign="center"
                         mb={4}
-                        color={useColorModeValue("gray.700", "dark.100")}
                     >
                         Register
                     </Heading>
                     <Text
                         textAlign="center"
                         fontSize="sm"
-                        color={useColorModeValue("gray.600", "dark.100")}
                     >
                         Please enter your details to sign up.
                     </Text>
                     <form onSubmit={handleSubmit}>
                         <VStack spacing={4} align="stretch">
-                            {/* Username Input */}
                             <FormControl isRequired>
-                                <FormLabel
-                                    htmlFor="username"
-                                    color={useColorModeValue(
-                                        "gray.700",
-                                        "dark.100"
-                                    )}
-                                >
-                                    Username
-                                </FormLabel>
+                                <FormLabel htmlFor="username">Username</FormLabel>
                                 <Input
                                     id="username"
                                     type="text"
                                     placeholder="Enter your username"
                                     value={username}
                                     minLength={4}
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
+                                    onChange={(e) => setUsername(e.target.value)}
                                 />
                             </FormControl>
 
-                            {/* Email Input */}
                             <FormControl isRequired>
-                                <FormLabel
-                                    htmlFor="email"
-                                    color={useColorModeValue(
-                                        "gray.700",
-                                        "dark.100"
-                                    )}
-                                >
-                                    Email address
-                                </FormLabel>
+                                <FormLabel htmlFor="email">Email address</FormLabel>
                                 <Input
                                     id="email"
                                     type="email"
@@ -172,81 +149,46 @@ export const RegisterPage = () => {
                                 />
                             </FormControl>
 
-                            {/* Password Input */}
                             <FormControl isRequired>
-                                <FormLabel
-                                    htmlFor="password"
-                                    color={useColorModeValue(
-                                        "gray.700",
-                                        "dark.100"
-                                    )}
-                                >
-                                    Password
-                                </FormLabel>
+                                <FormLabel htmlFor="password">Password</FormLabel>
                                 <InputGroup size="md">
                                     <Input
                                         id="password"
-                                        type={
-                                            showPassword ? "text" : "password"
-                                        }
+                                        type={showPassword ? "text" : "password"}
                                         placeholder="Enter your password"
                                         value={password}
                                         minLength={8}
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setPassword(e.target.value)}
                                     />
                                     <InputRightElement width="4.5rem">
-                                        <Button
-                                            h="1.75rem"
-                                            size="sm"
-                                            onClick={handleShowClick}
-                                        >
+                                        <Button h="1.75rem" size="sm" onClick={handleShowClick}>
                                             {showPassword ? "Hide" : "Show"}
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
                             </FormControl>
 
-                            {/*Confirm Password*/}
                             <FormControl isRequired>
-                                <FormLabel
-                                    htmlFor="confirm-password"
-                                    color={useColorModeValue(
-                                        "gray.700",
-                                        "dark.100"
-                                    )}
-                                >
-                                    Confirm Password
-                                </FormLabel>
+                                <FormLabel htmlFor="confirm-password">Confirm Password</FormLabel>
                                 <InputGroup size="md">
                                     <Input
                                         id="confirm-password"
-                                        type={
-                                            showPassword ? "text" : "password"
-                                        }
+                                        type={showPassword ? "text" : "password"}
                                         placeholder="Re-enter your password"
                                         value={confirmPassword}
-                                        onChange={(e) =>
-                                            setConfirmPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
                                     <InputRightElement width="4.5rem">
-                                        <Button
-                                            h="1.75rem"
-                                            size="sm"
-                                            onClick={handleShowClick}
-                                        >
+                                        <Button h="1.75rem" size="sm" onClick={handleShowClick}>
                                             {showPassword ? "Hide" : "Show"}
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
                             </FormControl>
 
-                            {/* Submit Button */}
                             <Button
                                 type="submit"
-                                colorScheme="blue"
+                                colorScheme="brand" // Using your brand colors
                                 size="lg"
                                 mt={4}
                             >

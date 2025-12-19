@@ -1,13 +1,11 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-// 1. Create a dedicated instance
 const api = axios.create({
     baseURL: API_BASE_URL,
 });
 
-// 2. Request Interceptor: Attach x-auth-token automatically
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("x-auth-token");
@@ -19,16 +17,12 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// 3. Response Interceptor: Handle 401 Unauthorized errors
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Clear credentials
             localStorage.removeItem("x-auth-token");
             localStorage.removeItem("username");
-            
-            // Broadcast logout event for the App to handle UI state
             window.dispatchEvent(new Event("force-logout"));
         }
         return Promise.reject(error);
