@@ -2,96 +2,107 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3000/api";
 
+// 1. Create a dedicated instance
+const api = axios.create({
+    baseURL: API_BASE_URL,
+});
+
+// 2. Request Interceptor: Attach x-auth-token automatically
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("x-auth-token");
+        if (token) {
+            config.headers["x-auth-token"] = token;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// 3. Response Interceptor: Handle 401 Unauthorized errors
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Clear credentials
+            localStorage.removeItem("x-auth-token");
+            localStorage.removeItem("username");
+            
+            // Broadcast logout event for the App to handle UI state
+            window.dispatchEvent(new Event("force-logout"));
+        }
+        return Promise.reject(error);
+    }
+);
+
 // --- Dashboard Fetchers ---
 export const fetchTopGames = async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/games/top-games`);
+    const { data } = await api.get(`/games/top-games`);
     return data;
 };
 
 export const fetchNewReleases = async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/games/new-releases`);
+    const { data } = await api.get(`/games/new-releases`);
     return data;
 };
 
 export const fetchUpcomingGames = async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/games/upcoming`);
+    const { data } = await api.get(`/games/upcoming`);
     return data;
 };
 
 // --- Generic Game Data Fetcher ---
 export const fetchGamesByIds = async (ids) => {
     if (!ids || ids.length === 0) return [];
-    const { data } = await axios.post(`${API_BASE_URL}/games/by-ids`, { ids });
+    const { data } = await api.post(`/games/by-ids`, { ids });
     return data;
 };
 
 // --- Generic User List Functions ---
-
-// GET /api/users/lists
 export const getAllUserLists = async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/users/lists`);
+    const { data } = await api.get(`/users/lists`);
     return data;
 };
 
-// --- NEW: List Management ---
-
-// POST /api/users/lists
+// --- List Management ---
 export const createList = async (listName) => {
-    const { data } = await axios.post(`${API_BASE_URL}/users/lists`, {
+    const { data } = await api.post(`/users/lists`, {
         name: listName,
     });
     return data;
 };
 
-// PUT /api/users/lists/:listName
 export const renameList = async (listName, newName) => {
-    const { data } = await axios.put(
-        `${API_BASE_URL}/users/lists/${listName}`,
-        { newName }
-    );
+    const { data } = await api.put(`/users/lists/${listName}`, { newName });
     return data;
 };
 
-// DELETE /api/users/lists/:listName
 export const deleteList = async (listName) => {
-    const { data } = await axios.delete(
-        `${API_BASE_URL}/users/lists/${listName}`
-    );
+    const { data } = await api.delete(`/users/lists/${listName}`);
     return data;
 };
 
-// --- CHANGED: Game-in-List Management ---
-
-// POST /api/users/lists/:listName/games
+// --- Game-in-List Management ---
 export const addGameToList = async ({ listName, gameId }) => {
-    const { data } = await axios.post(
-        `${API_BASE_URL}/users/lists/${listName}/games`,
-        { gameId }
-    );
+    const { data } = await api.post(`/users/lists/${listName}/games`, { gameId });
     return data;
 };
 
-// DELETE /api/users/lists/:listName/games/:gameId
 export const removeGameFromList = async ({ listName, gameId }) => {
-    const { data } = await axios.delete(
-        `${API_BASE_URL}/users/lists/${listName}/games/${gameId}`
-    );
+    const { data } = await api.delete(`/users/lists/${listName}/games/${gameId}`);
     return data;
 };
 
 // --- Other Game Fetchers ---
-
 export const fetchGameById = async (gameId) => {
     if (!gameId) return null;
-    const { data } = await axios.get(`${API_BASE_URL}/games/${gameId}`);
+    const { data } = await api.get(`/games/${gameId}`);
     return data;
 };
 
 export const searchGames = async (searchTerm) => {
-    if (!searchTerm || searchTerm.trim() === "") {
-        return [];
-    }
-    const { data } = await axios.get(`${API_BASE_URL}/games/search`, {
+    if (!searchTerm || searchTerm.trim() === "") return [];
+    const { data } = await api.get(`/games/search`, {
         params: { term: searchTerm },
     });
     return data;
@@ -104,54 +115,39 @@ export const browseGames = async (filters) => {
         sortOrder: filters.sortOrder,
     };
 
-    if (filters.genre && filters.genre.length > 0) {
-        params.genre = filters.genre.join(",");
-    }
-    if (filters.platform && filters.platform.length > 0) {
-        params.platform = filters.platform.join(",");
-    }
-    if (filters.minRating) {
-        params.minRating = filters.minRating;
-    }
-    if (filters.releaseYearStart) {
-        params.releaseYearStart = filters.releaseYearStart;
-    }
-    if (filters.releaseYearEnd) {
-        params.releaseYearEnd = filters.releaseYearEnd;
-    }
+    if (filters.genre?.length > 0) params.genre = filters.genre.join(",");
+    if (filters.platform?.length > 0) params.platform = filters.platform.join(",");
+    if (filters.minRating) params.minRating = filters.minRating;
+    if (filters.releaseYearStart) params.releaseYearStart = filters.releaseYearStart;
+    if (filters.releaseYearEnd) params.releaseYearEnd = filters.releaseYearEnd;
 
-    const { data } = await axios.get(`${API_BASE_URL}/games/browse`, {
-        params,
-    });
+    const { data } = await api.get(`/games/browse`, { params });
     return data;
 };
 
 export const fetchUserReviewForGame = async (gameId) => {
-    const { data } = await axios.get(`${API_BASE_URL}/reviews/game/${gameId}`);
+    const { data } = await api.get(`/reviews/game/${gameId}`);
     return data;
 };
 
 export const submitReview = async (reviewData) => {
-    const { data } = await axios.post(`${API_BASE_URL}/reviews`, reviewData);
+    const { data } = await api.post(`/reviews`, reviewData);
     return data;
 };
 
 export const deleteReview = async (gameId) => {
-    const { data } = await axios.delete(`${API_BASE_URL}/reviews/game/${gameId}`);
+    const { data } = await api.delete(`/reviews/game/${gameId}`);
     return data;
 };
 
 export const getMyReviews = async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/reviews/my-reviews`);
+    const { data } = await api.get(`/reviews/my-reviews`);
     return data;
 };
 
 export const fetchCommunityReviewsForGame = async (gameId) => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/reviews/community/${gameId}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error in fetchCommunityReviewsForGame API call:", error);
-        throw error;
-    }
+    const { data } = await api.get(`/reviews/community/${gameId}`);
+    return data;
 };
+
+export default api;

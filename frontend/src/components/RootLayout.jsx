@@ -61,7 +61,6 @@ export function RootLayout() {
         return () => clearTimeout(debounceTimer);
     }, [searchTerm, navigate]);
 
-    // --- Clear search term when navigating away ---
     useEffect(() => {
         if (!location.pathname.startsWith("/search/")) {
             setSearchTerm("");
@@ -139,7 +138,6 @@ export function RootLayout() {
                         <NavLink to="/">Home</NavLink>
                         {isAuthenticated && (
                             <>
-
                                 <NavLink to="/my-lists">My Lists</NavLink>
                             </>
                         )}

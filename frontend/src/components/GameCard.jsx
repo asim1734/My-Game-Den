@@ -29,29 +29,33 @@ import {
     FaDesktop,
     FaPlus,
     FaTrash,
+    FaLock,
 } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import { useGameActions } from "../hooks/useGameActions";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUserLists } from "../api";
 
-const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
 const GameCard = ({ game, variant = "dashboard" }) => {
+    // 1. Check Auth Status
+    const isLoggedIn = !!localStorage.getItem("x-auth-token");
+
     const { handleAddGame, isAdding, handleRemoveGame, isRemoving } =
         useGameActions(game);
 
+    // 2. Only fetch lists if logged in
     const { data: allLists, isLoading: isListsLoading } = useQuery({
         queryKey: ["userLists"],
         queryFn: getAllUserLists,
         staleTime: 1000 * 60 * 5,
+        enabled: isLoggedIn, 
     });
 
     const gameInLists = useMemo(() => {
         const listSet = new Set();
         if (!allLists) return listSet;
         for (const list of allLists) {
-            if (list.games.includes(game.igdbId)) {
+            if (list.games?.includes(game.igdbId)) {
                 listSet.add(list.name);
             }
         }
@@ -77,13 +81,17 @@ const GameCard = ({ game, variant = "dashboard" }) => {
             display="flex"
             flexDirection="column"
             overflow="visible"
+            bg="brand.800"
+            border="1px solid"
+            borderColor="whiteAlpha.100"
             _hover={{
                 transform: "scale(1.02)",
-                boxShadow: "lg",
+                boxShadow: "xl",
                 position: "relative",
                 zIndex: 10,
+                borderColor: "teal.500",
             }}
-            transition="transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out"
+            transition="all 0.2s ease-in-out"
         >
             <AspectRatio
                 ratio={3 / 4}
@@ -91,11 +99,15 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                 borderTopRadius="lg"
                 overflow="hidden"
             >
-                <Image src={game.coverUrl} alt={game.title} objectFit="cover" />
+                <Image 
+                    src={game.coverUrl} 
+                    alt={game.title} 
+                    objectFit="cover" 
+                    fallbackSrc="https://via.placeholder.com/300x400?text=No+Cover"
+                />
             </AspectRatio>
 
             <CardBody p={3} flex="1" display="flex" flexDirection="column">
-                {/* ... (Top part of CardBody is unchanged) ... */}
                 <HStack justify="space-between" mb={2}>
                     {game.rating && (
                         <Badge
@@ -118,7 +130,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                 </HStack>
 
                 <LinkOverlay as={RouterLink} to={`/game/${game.igdbId}`}>
-                    <Heading size="sm" noOfLines={2} title={game.title} mb={2}>
+                    <Heading size="sm" noOfLines={2} title={game.title} mb={2} color="white">
                         {game.title}
                     </Heading>
                 </LinkOverlay>
@@ -126,7 +138,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                 <VStack align="start" spacing={1} color="gray.400">
                     {game.genres?.length > 0 && (
                         <HStack spacing={1}>
-                            <Icon as={FaTags} boxSize={3} />
+                            <Icon as={FaTags} boxSize={3} color="teal.500" />
                             <Text fontSize="xs" noOfLines={1}>
                                 {game.genres.join(", ")}
                             </Text>
@@ -134,8 +146,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     )}
                     {game.platforms?.length > 0 && (
                         <HStack spacing={1}>
-                            <Icon as={FaDesktop} boxSize={3} />
-                            {/* --- 1. FIX: Changed 'noOfFiles' back to 'noOfLines' --- */}
+                            <Icon as={FaDesktop} boxSize={3} color="teal.500" />
                             <Text fontSize="xs" noOfLines={1}>
                                 {game.platforms.join(", ")}
                             </Text>
@@ -145,64 +156,73 @@ const GameCard = ({ game, variant = "dashboard" }) => {
 
                 <Spacer />
 
-                <Menu closeOnSelect={false}>
-                    <MenuButton
-                        as={Button}
+                {/* --- Conditional List Management --- */}
+                {isLoggedIn ? (
+                    <Menu closeOnSelect={false}>
+                        <MenuButton
+                            as={Button}
+                            size="sm"
+                            width="100%"
+                            mt={3}
+                            colorScheme="teal"
+                            variant="solid"
+                            isLoading={isAdding || isRemoving}
+                        >
+                            Manage Lists...
+                        </MenuButton>
+                        <MenuList bg="gray.800" minWidth="180px" zIndex={20} borderColor="gray.700">
+                            {isListsLoading && (
+                                <Center p={2}>
+                                    <Spinner size="sm" color="teal.500" />
+                                </Center>
+                            )}
+                            {allLists &&
+                                allLists.map((list) => {
+                                    const isInThisList = gameInLists.has(list.name);
+                                    return (
+                                        <MenuItem
+                                            key={list.name}
+                                            bg="gray.800"
+                                            _hover={{ bg: "gray.700" }}
+                                            icon={
+                                                isInThisList ? (
+                                                    <Icon as={FaTrash} color="red.400" />
+                                                ) : (
+                                                    <Icon as={FaPlus} color="green.400" />
+                                                )
+                                            }
+                                            onClick={(e) => {
+                                                e.preventDefault(); // Prevent LinkBox trigger
+                                                if (isInThisList) {
+                                                    handleRemoveGame(e, list.name);
+                                                } else {
+                                                    handleAddGame(e, list.name);
+                                                }
+                                            }}
+                                        >
+                                            <Text fontSize="sm">
+                                                {isInThisList ? "Remove from" : "Add to"} {list.name}
+                                            </Text>
+                                        </MenuItem>
+                                    );
+                                })}
+                        </MenuList>
+                    </Menu>
+                ) : (
+                    <Button
+                        as={RouterLink}
+                        to="/login"
                         size="sm"
                         width="100%"
                         mt={3}
-                        colorScheme="teal"
-                        variant="solid"
-                        isLoading={isAdding || isRemoving}
+                        variant="outline"
+                        colorScheme="whiteAlpha"
+                        leftIcon={<Icon as={FaLock} boxSize={3} />}
+                        _hover={{ bg: "whiteAlpha.200" }}
                     >
-                        Manage Lists...
-                    </MenuButton>
-                    <MenuList bg="brand.800" minWidth="180px" zIndex={10}>
-                        {isListsLoading && (
-                            <Center p={2}>
-                                <Spinner size="sm" />
-                            </Center>
-                        )}
-                        {allLists &&
-                            allLists.map((list) => {
-                                {
-                                    /* --- 2. FIX: Changed 'list.static' to 'list.name' --- */
-                                }
-                                const isInThisList = gameInLists.has(list.name);
-
-                                return (
-                                    <MenuItem
-                                        key={list.name}
-                                        icon={
-                                            isInThisList ? (
-                                                <Icon
-                                                    as={FaTrash}
-                                                    color="red.400"
-                                                />
-                                            ) : (
-                                                <Icon
-                                                    as={FaPlus}
-                                                    color="green.400"
-                                                />
-                                            )
-                                        }
-                                        onClick={(e) => {
-                                            if (isInThisList) {
-                                                handleRemoveGame(e, list.name);
-                                            } else {
-                                                handleAddGame(e, list.name);
-                                            }
-                                        }}
-                                    >
-                                        {isInThisList
-                                            ? "Remove from"
-                                            : "Add to"}{" "}
-                                        {list.name}
-                                    </MenuItem>
-                                );
-                            })}
-                    </MenuList>
-                </Menu>
+                        Login to Add
+                    </Button>
+                )}
             </CardBody>
         </LinkBox>
     );

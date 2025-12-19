@@ -31,8 +31,8 @@ mongoose
     .catch((err) => console.error("MongoDB connection error:", err));
 
 app.use("/api/auth", authRouter);
-app.use("/api/games", authMiddleware, gamesRouter);
-app.use("/api/users", authMiddleware, userRouter);
+app.use("/api/games", gamesRouter);
+app.use("/api/users",authMiddleware,  userRouter);
 app.use("/api/reviews",authMiddleware, reviewRouter);
 
 app.listen(PORT, () => {

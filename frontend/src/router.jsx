@@ -11,6 +11,7 @@ import { SearchResultsPage } from "./pages/SearchResultPage";
 import { BrowsePage } from "./pages/BrowsePage";
 import { MyReviewsPage } from "./pages/MyReviewsPage";
 import { MyListsPage } from "./pages/MyListsPage";
+import { ProtectedRoute } from "./components/ProtectedRoute"; // Import the guard
 
 const router = createBrowserRouter([
     {
@@ -30,14 +31,9 @@ const router = createBrowserRouter([
                 path: "register",
                 element: <RegisterPage />,
             },
-            // NEW: Add route for My Lists page
             {
-                path: "my-lists",
-                element: <MyListsPage />,
-            },
-            {
-                path: "lists/:listName",
-                element: <UserListPage />,
+                path: "browse",
+                element: <BrowsePage />,
             },
             {
                 path: "game/:id",
@@ -47,13 +43,30 @@ const router = createBrowserRouter([
                 path: "search/:searchTerm",
                 element: <SearchResultsPage />,
             },
+            // --- PROTECTED ROUTES ---
             {
-                path: "browse",
-                element: <BrowsePage />,
+                path: "lists/:listName",
+                element: (
+                    <ProtectedRoute>
+                        <UserListPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "my-lists",
+                element: (
+                    <ProtectedRoute>
+                        <MyListsPage />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: "my-reviews",
-                element: <MyReviewsPage/>
+                element: (
+                    <ProtectedRoute>
+                        <MyReviewsPage />
+                    </ProtectedRoute>
+                )
             }
         ],
     },
