@@ -94,11 +94,15 @@ export const fetchGameById = async (gameId) => {
     return data;
 };
 
-export const searchGames = async (searchTerm) => {
+export const searchGames = async (searchTerm, filters = {}) => {
     if (!searchTerm || searchTerm.trim() === "") return [];
-    const { data } = await api.get(`/games/search`, {
-        params: { term: searchTerm },
-    });
+    
+    const params = { 
+        term: searchTerm,
+        ...filters 
+    };
+
+    const { data } = await api.get(`/games/search`, { params });
     return data;
 };
 

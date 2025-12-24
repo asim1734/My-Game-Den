@@ -40,7 +40,7 @@ const router = createBrowserRouter([
                 element: <GameDetailsPage />,
             },
             {
-                path: "search/:searchTerm",
+                path: "search/:term",
                 element: <SearchResultsPage />,
             },
             // --- PROTECTED ROUTES ---

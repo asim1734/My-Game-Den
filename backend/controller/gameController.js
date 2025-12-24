@@ -188,36 +188,38 @@ exports.getGameById = async (req, res) => {
 
 exports.searchGames = async (req, res) => {
     try {
-        const searchTerm = req.query.term;
-        if (!searchTerm) {
-            return res
-                .status(400)
-                .json({ message: "Search term is required." });
-        }
+        const { 
+            term, 
+            sortBy = "total_rating_count", 
+            sortOrder = "desc", 
+            page = 1 
+        } = req.query;
 
-        // --- ADDED 'where' CLAUSE BACK ---
-        const queryString = `
-            search "${searchTerm}";
-            fields name, cover.url, first_release_date, total_rating;
-            where cover != null;
-            limit 50;
-        `; // Semicolon at end
+        if (!term) return res.status(400).json({ message: "Search term is required." });
 
-        console.log(
-            "Sending Stricter Search Query:",
-            queryString.replace(/\s+/g, " ").trim()
-        );
+        const whereClauses = [
+            `name ~ *"${term}"*`, 
+            `game_type = (0, 8, 11)`, 
+            `cover != null`,
+            `total_rating_count != null` 
+        ];
 
-        const rawGames = await fetchFromIGDB(
-            "games",
-            queryString,
-            `Search: ${searchTerm}`
-        );
+        const whereString = whereClauses.join(" & ");
+        const limit = 24;
+const offset = (parseInt(page) - 1) * limit;
 
-        // No need to filter for covers here anymore, IGDB does it.
+const queryString = `
+    fields name, cover.url, first_release_date, total_rating, total_rating_count, game_type;
+    where ${whereString};
+    sort ${sortBy} ${sortOrder};
+    limit ${limit};
+    offset ${offset}; 
+`;
+
+        const rawGames = await fetchFromIGDB("games", queryString, `Sorted Search: ${term}`);
         res.status(200).json(rawGames.map(mapGameData));
     } catch (error) {
-        console.error("Error details in searchGames:", error);
+        console.error("Search error:", error);
         res.status(500).json({ message: "Error searching games." });
     }
 };
