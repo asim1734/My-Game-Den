@@ -11,20 +11,21 @@ import {
     useToast,
     IconButton,
     useDisclosure,
+    Avatar,
+    Divider,
+    Center,
 } from "@chakra-ui/react";
-import { FaStar, FaTrash, FaPencilAlt } from "react-icons/fa";
+import { FaStar, FaTrash, FaPencilAlt, FaLock } from "react-icons/fa";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchUserReviewForGame, submitReview, deleteReview } from "../api";
 
 export const ReviewSection = ({ game }) => {
     const toast = useToast();
     const queryClient = useQueryClient();
-    
-    // isOpen controls the "Form/Edit" state. 
-    // If true: Show textarea/rating picker. 
-    // If false: Show the saved review.
+    const isAuthenticated = !!localStorage.getItem("x-auth-token");
+    const username = localStorage.getItem("username");
+
     const { isOpen, onOpen, onClose } = useDisclosure();
-    
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [content, setContent] = useState("");
@@ -32,34 +33,25 @@ export const ReviewSection = ({ game }) => {
     const { data: existingReview, isLoading } = useQuery({
         queryKey: ["review", game?.igdbId],
         queryFn: () => fetchUserReviewForGame(game.igdbId),
-        enabled: !!game?.igdbId,
+        enabled: !!game?.igdbId && isAuthenticated,
     });
 
-    // Handle initial state and synchronization
     useEffect(() => {
         if (existingReview) {
             setRating(existingReview.rating);
             setContent(existingReview.content || "");
-            // If we have a review, we show the "view" state (isOpen = false)
-            onClose();
+            onClose(); // Default to view mode if review exists
         } else {
-            // If no review exists, we show the "write" state (isOpen = true)
-            onOpen();
+            onOpen(); // Default to write mode if no review
         }
-    }, [existingReview, onOpen, onClose]);
+    }, [existingReview, onClose, onOpen]);
 
     const mutation = useMutation({
         mutationFn: submitReview,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["review", game.igdbId] });
-            toast({
-                title: "Review saved!",
-                status: "success",
-                duration: 2000,
-                position: "top",
-            });
-            // --- AUTOMATIC TRANSITION ---
-            // Hide the form and go to the "view" state once saved
+            queryClient.invalidateQueries({ queryKey: ["reviews", "community", game.igdbId] });
+            toast({ title: "Review saved!", status: "success", position: "top" });
             onClose();
         },
     });
@@ -68,22 +60,17 @@ export const ReviewSection = ({ game }) => {
         mutationFn: deleteReview,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["review", game.igdbId] });
+            queryClient.invalidateQueries({ queryKey: ["reviews", "community", game.igdbId] });
             setRating(0);
             setContent("");
-            toast({
-                title: "Review deleted.",
-                status: "info",
-                duration: 2000,
-                position: "top",
-            });
-            // Go back to the "write" state after deletion
+            toast({ title: "Review deleted.", status: "info", position: "top" });
             onOpen();
         },
     });
 
     const handleSubmit = () => {
         if (rating === 0) {
-            return toast({ title: "Please select a rating", status: "warning" });
+            return toast({ title: "Please select a star rating", status: "warning", position: "top" });
         }
         mutation.mutate({
             gameId: game.igdbId,
@@ -94,110 +81,131 @@ export const ReviewSection = ({ game }) => {
         });
     };
 
+    if (!isAuthenticated) {
+        return (
+            <Box bg="brand.800" p={8} borderRadius="xl" border="1px dashed" borderColor="brand.600" textAlign="center">
+                <VStack spacing={3}>
+                    <Icon as={FaLock} w={6} h={6} color="brand.400" />
+                    <Heading size="sm">Want to leave a review?</Heading>
+                    <Text fontSize="sm" color="gray.400">Please log in to share your thoughts with the den.</Text>
+                </VStack>
+            </Box>
+        );
+    }
+
     if (isLoading) return null;
 
     return (
-        <Box bg="brand.800" p={6} borderRadius="xl" boxShadow="xl">
-            <VStack align="stretch" spacing={4}>
+        <Box 
+            bg="brand.800" 
+            p={6} 
+            borderRadius="xl" 
+            border="1px solid" 
+            borderColor="brand.700" 
+            boxShadow="2xl"
+        >
+            <VStack align="stretch" spacing={5}>
                 <HStack justify="space-between">
-                    <Heading size="md" color="brand.100">Your Review</Heading>
-                    {/* Only show these icons if we are NOT in edit mode and a review exists */}
+                    <HStack spacing={3}>
+                        <Avatar size="xs" name={username} bg="brand.500" />
+                        <Heading size="sm" color="white">Your Experience</Heading>
+                    </HStack>
+                    
                     {existingReview && !isOpen && (
-                        <HStack>
+                        <HStack spacing={2}>
                             <IconButton
-                                size="sm"
+                                size="xs"
                                 variant="ghost"
-                                color="gray.400"
-                                _hover={{ color: "brand.300", bg: "brand.700" }}
                                 icon={<FaPencilAlt />}
                                 onClick={onOpen}
-                                aria-label="Edit review"
+                                aria-label="Edit"
+                                color="gray.400"
+                                _hover={{ bg: "brand.700", color: "white" }}
                             />
                             <IconButton
-                                size="sm"
+                                size="xs"
                                 variant="ghost"
                                 colorScheme="red"
                                 icon={<FaTrash />}
                                 onClick={() => removeMutation.mutate(game.igdbId)}
                                 isLoading={removeMutation.isPending}
-                                aria-label="Delete review"
+                                aria-label="Delete"
                             />
                         </HStack>
                     )}
                 </HStack>
 
-                {/* WRITE / EDIT STATE */}
+                <Divider borderColor="brand.700" />
+
                 {isOpen ? (
+                    /* --- WRITE / EDIT STATE --- */
                     <VStack align="stretch" spacing={4}>
                         <HStack spacing={2}>
-                            <Text fontWeight="bold" fontSize="sm">Rating:</Text>
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Icon
                                     key={star}
                                     as={FaStar}
-                                    boxSize={6}
+                                    boxSize={7}
                                     cursor="pointer"
                                     color={(hoverRating || rating) >= star ? "yellow.400" : "gray.600"}
                                     onMouseEnter={() => setHoverRating(star)}
                                     onMouseLeave={() => setHoverRating(0)}
                                     onClick={() => setRating(star)}
                                     transition="all 0.2s"
-                                    _hover={{ transform: "scale(1.2)" }}
+                                    _hover={{ transform: "scale(1.1)" }}
                                 />
                             ))}
+                            <Text ml={2} fontSize="sm" color="gray.400" fontWeight="bold">
+                                {rating > 0 ? `${rating} / 5` : "Select Rating"}
+                            </Text>
                         </HStack>
 
                         <Textarea
-                            placeholder="Share your thoughts on this game..."
+                            placeholder="What did you think of the gameplay, story, and graphics?"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             bg="brand.900"
-                            border="none"
-                            _focus={{ ring: 1, ringColor: "brand.500" }}
+                            border="1px solid"
+                            borderColor="brand.700"
+                            _focus={{ borderColor: "brand.500", ring: 1, ringColor: "brand.500" }}
                             rows={4}
+                            fontSize="sm"
                         />
 
                         <HStack justify="flex-end">
-                            {/* If editing an existing review, allow user to cancel back to view mode */}
                             {existingReview && (
-                                <Button variant="ghost" size="sm" onClick={onClose}>
+                                <Button variant="ghost" size="sm" onClick={onClose} color="gray.400">
                                     Cancel
                                 </Button>
                             )}
                             <Button
-                                colorScheme="teal"
+                                colorScheme="purple"
                                 size="sm"
+                                px={6}
                                 onClick={handleSubmit}
                                 isLoading={mutation.isPending}
                             >
-                                {existingReview ? "Update Review" : "Post Review"}
+                                {existingReview ? "Update Review" : "Post to Den"}
                             </Button>
                         </HStack>
                     </VStack>
                 ) : (
-                    /* VIEW STATE */
-                    existingReview && (
-        <Box>
-            <HStack mb={2} spacing={1}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <Icon
-                        key={star}
-                        as={FaStar}
-                        boxSize={4}
-                        // Use optional chaining here as a safety net
-                        color={(existingReview?.rating ?? 0) >= star ? "yellow.400" : "gray.600"}
-                    />
-                ))}
-            </HStack>
-            <Text color="gray.300" fontSize="md">
-                {existingReview?.content || (
-                    <Text as="span" fontStyle="italic" color="gray.500">
-                        No text review provided.
-                    </Text>
-                )}
-            </Text>
-        </Box>
-    )
+                    /* --- VIEW STATE --- */
+                    <Box px={2}>
+                        <HStack mb={3} spacing={1}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Icon
+                                    key={star}
+                                    as={FaStar}
+                                    boxSize={4}
+                                    color={rating >= star ? "yellow.400" : "gray.700"}
+                                />
+                            ))}
+                        </HStack>
+                        <Text color="gray.200" fontSize="md" fontStyle={!content ? "italic" : "normal"}>
+                            {content || "You rated this game but didn't write a text review."}
+                        </Text>
+                    </Box>
                 )}
             </VStack>
         </Box>
