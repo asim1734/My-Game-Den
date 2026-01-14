@@ -17,9 +17,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllUserLists } from "../api";
 import { FaPlus, FaPencilAlt, FaTrash, FaChevronRight } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
-import { CreateListModal } from "../components/CreateListModal";
-import { RenameListModal } from "../components/RenameListModal";
-import { DeleteListAlert } from "../components/DeleteListAlert";
+import { CreateListModal } from "../components/library/CreateListModal";
+import { RenameListModal } from "../components/library/RenameListModal";
+import { DeleteListAlert } from "../components/library/DeleteListAlert";
 
 // We can't rename or delete these
 const defaultLists = ["collection", "wishlist"];

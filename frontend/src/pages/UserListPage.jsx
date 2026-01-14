@@ -10,7 +10,6 @@ import {
     Text,
 } from "@chakra-ui/react";
 import GameCard from "../components/GameCard";
-// 1. IMPORT THE SKELETON
 import GameCardSkeleton from "../components/GameCardSkeleton";
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -18,9 +17,7 @@ const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 export const UserListPage = () => {
     const { listName } = useParams();
 
-    // 2. DEFINE A SKELETONS ARRAY
-    const skeletons = Array(12).fill(0); // 12 is a good default
-
+    const skeletons = Array(12).fill(0); 
     const { data: allLists, status: listsStatus } = useQuery({
         queryKey: ["userLists"],
         queryFn: getAllUserLists,
@@ -40,11 +37,9 @@ export const UserListPage = () => {
     });
 
     const isInitialLoading =
-        listsStatus === "pending" || (!!listIds && gamesStatus === "pending"); // More accurate loading state
+        listsStatus === "pending" || (!!listIds && gamesStatus === "pending"); 
 
-    // 3. FIXED THE LOADING BLOCK
     if (isInitialLoading) {
-        // We return the full page layout, but with skeletons, to prevent pop-in
         return (
             <Box p={8}>
                 <Heading mb={6}>My {capitalize(listName)}</Heading>
@@ -88,7 +83,6 @@ export const UserListPage = () => {
                     ))}
                 </SimpleGrid>
             ) : (
-                // This empty state is perfect!
                 <Center
                     minH="200px"
                     borderWidth="1px"

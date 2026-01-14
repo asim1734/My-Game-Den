@@ -32,8 +32,8 @@ const userSchema = new Schema(
         lists: {
             type: [listSchema],
             default: [
-                { name: "collection", games: [] },
-                { name: "wishlist", games: [] },
+                { name: "Collection", games: [] },
+                { name: "Wishlist", games: [] },
             ],
         },
     },

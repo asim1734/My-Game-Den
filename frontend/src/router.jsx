@@ -11,69 +11,98 @@ import { SearchResultsPage } from "./pages/SearchResultPage";
 import { BrowsePage } from "./pages/BrowsePage";
 import { MyReviewsPage } from "./pages/MyReviewsPage";
 import { MyListsPage } from "./pages/MyListsPage";
-import { ProtectedRoute } from "./components/ProtectedRoute"; // Import the guard
+import { TierListEditorPage } from "./pages/TierListEditorPage";
+import { MyLibraryPage } from "./pages/MyLibraryPage";
+import {CollectionDetailsPage} from "./pages/CollectionDetailsPage"
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <RootLayout />,
-        errorElement: <ErrorPage />,
-        children: [
-            {
-                index: true,
-                element: <DashboardPage />,
-            },
-            {
-                path: "login",
-                element: <LoginPage />,
-            },
-            {
-                path: "register",
-                element: <RegisterPage />,
-            },
-            {
-                path: "browse",
-                element: <BrowsePage />,
-            },
-            {
-                path: "game/:id",
-                element: <GameDetailsPage />,
-            },
-            {
-                path: "search/:term",
-                element: <SearchResultsPage />,
-            },
-            // --- PROTECTED ROUTES ---
-            {
-                path: "lists/:listName",
-                element: (
-                    <ProtectedRoute>
-                        <UserListPage />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "my-lists",
-                element: (
-                    <ProtectedRoute>
-                        <MyListsPage />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "my-reviews",
-                element: (
-                    <ProtectedRoute>
-                        <MyReviewsPage />
-                    </ProtectedRoute>
-                )
-            }
-        ],
-    },
-    {
-        path: "*",
-        element: <ErrorPage />,
-    },
+  {
+    path: "/",
+    element: <RootLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <DashboardPage />,
+      },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "browse",
+        element: <BrowsePage />,
+      },
+      {
+        path: "game/:id",
+        element: <GameDetailsPage />,
+      },
+      {
+        path: "search/:term",
+        element: <SearchResultsPage />,
+      },
+
+      // ---- PROTECTED ROUTES ----
+      {
+        path: "lists/:listName",
+        element: (
+          <ProtectedRoute>
+            <UserListPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "my-lists",
+        element: (
+          <ProtectedRoute>
+            <MyListsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "my-reviews",
+        element: (
+          <ProtectedRoute>
+            <MyReviewsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "tierlist-editor/:id",
+        element: (
+          <ProtectedRoute>
+            <TierListEditorPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "library",
+        element: (
+          <ProtectedRoute>
+            <MyLibraryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/collections/:name",
+        element: (
+          <ProtectedRoute>
+            <CollectionDetailsPage />
+          </ProtectedRoute>
+        )
+      }
+      
+    ],
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
 ]);
 
 export default router;
