@@ -30,8 +30,8 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use("/api/auth", authRouter);
 app.use("/api/games", gamesRouter);
-app.use("/api/tierlists", tierListRouter); 
 
+app.use("/api/tierlists",protect, tierListRouter); 
 app.use("/api/users", protect, userRouter);
 app.use("/api/reviews", protect, reviewRouter);
 

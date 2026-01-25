@@ -148,4 +148,29 @@ export const fetchCommunityReviewsForGame = async (gameId) => {
     return data;
 };
 
+export const getMyTierLists = async () => {
+    const res = await api.get("/tierlists/my-lists");
+    return res.data;
+};
+
+export const createTierList = async (data) => {
+    const res = await api.post("/tierlists", data);
+    return res.data;
+};
+
+export const getTierList = async (id) => {
+    const res = await api.get(`/tierlists/${id}`);
+    return res.data;
+};
+
+export const updateTierList = async (id, data) => {
+    const res = await api.put(`/tierlists/${id}`, data);
+    return res.data;
+};
+
+export const deleteTierList = async (id) => {
+    const res = await api.delete(`/tierlists/${id}`);
+    return res.data;
+};
+
 export default api;

@@ -1,20 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { 
-    createTierList, 
-    updateTierList, 
-    getTierListBySlug, 
-    getMyTierLists,
-    deleteTierList 
-} = require('../controller/tierListController');
+const controller = require('../controller/tierListController');
 
-const { protect, optionalAuth } = require('../middleware/authMiddleware');
+router.post('/', controller.createTierList);
+router.get('/my', controller.getMyTierLists);
 
-router.post('/', protect, createTierList);
-router.get('/my', protect, getMyTierLists);
-router.put('/:id', protect, updateTierList);
-router.delete('/:id', protect, deleteTierList);
+router.get('/:id', controller.getTierListById); 
 
-router.get('/slug/:slug', optionalAuth, getTierListBySlug);
+router.put('/:id', controller.updateTierList);
+router.delete('/:id', controller.deleteTierList);
 
 module.exports = router;

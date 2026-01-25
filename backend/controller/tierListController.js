@@ -7,7 +7,7 @@ exports.createTierList = async (req, res) => {
         const newList = new TierList({
             user: req.user.id,
             title: title || "Untitled Tier List",
-            category: category || "Games"
+            category: category || "Games",
         });
 
         const savedList = await newList.save();
@@ -15,6 +15,23 @@ exports.createTierList = async (req, res) => {
     } catch (error) {
         console.error("Create Tier List Error:", error);
         res.status(500).json({ message: "Failed to create tier list" });
+    }
+};
+
+exports.getTierListById = async (req, res) => {
+    try {
+        const list = await TierList.findById(req.params.id);
+
+        if (!list) return res.status(404).json({ message: "Tier list not found" });
+
+        if (!list.isPublic && list.user.toString() !== req.user.id) {
+            return res.status(403).json({ message: "This tier list is private." });
+        }
+
+        res.status(200).json(list);
+    } catch (error) {
+        console.error("Get ID Error:", error);
+        res.status(500).json({ message: "Error fetching tier list" });
     }
 };
 
@@ -26,7 +43,6 @@ exports.getTierListBySlug = async (req, res) => {
         if (!list) return res.status(404).json({ message: "Tier list not found" });
 
         if (!list.isPublic) {
-            
             if (!req.user || list.user._id.toString() !== req.user.id) {
                 return res.status(403).json({ message: "This tier list is private." });
             }
@@ -41,7 +57,8 @@ exports.getTierListBySlug = async (req, res) => {
 exports.updateTierList = async (req, res) => {
     try {
         const { id } = req.params;
-        const { tiers, unrankedPool, title, description, isPublic, category } = req.body;
+        
+        const { tiers, unrankedPool, title, isPublic, category } = req.body;
 
         const updatedList = await TierList.findOneAndUpdate(
             { _id: id, user: req.user.id },
@@ -50,7 +67,6 @@ exports.updateTierList = async (req, res) => {
                     tiers, 
                     unrankedPool, 
                     title, 
-                    description, 
                     isPublic, 
                     category 
                 } 
