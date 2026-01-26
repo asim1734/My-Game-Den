@@ -171,6 +171,7 @@ export const useTierList = (tierListId) => {
     const handleDragOver = (event) => {
         const { active, over } = event;
         if (!over) return;
+        if (over.id === "TRASH") return;
 
         const activeId = active.id;
         const overId = over.id;
@@ -182,6 +183,7 @@ export const useTierList = (tierListId) => {
         setItems((prev) => {
             const activeItems = prev[activeContainer];
             const overItems = prev[overContainer];
+            
             const activeIndex = activeItems.findIndex(g => (g.igdbId || g.id).toString() === activeId.toString());
             const overIndex = overItems.findIndex(g => (g.igdbId || g.id).toString() === overId.toString());
 
@@ -210,8 +212,32 @@ export const useTierList = (tierListId) => {
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
+
+        if (!over) {
+            setActiveDragItem(null);
+            return;
+        }
+
+        if (over.id === "TRASH") {
+            const activeContainer = findContainer(active.id);
+            if (activeContainer) {
+                const activeIdString = active.id.toString();
+                
+                setItems((prev) => ({
+                    ...prev,
+                    [activeContainer]: prev[activeContainer].filter(
+                        (item) => (item.igdbId || item.id).toString() !== activeIdString
+                    )
+                }));
+                
+                toast({ title: "Game Removed", status: "info", duration: 1500, isClosable: true });
+            }
+            setActiveDragItem(null);
+            return;
+        }
+
         const activeContainer = findContainer(active.id);
-        const overContainer = findContainer(over?.id);
+        const overContainer = findContainer(over.id);
 
         if (activeContainer && overContainer && activeContainer === overContainer) {
             const activeIndex = items[activeContainer].findIndex(g => (g.igdbId || g.id).toString() === active.id.toString());
@@ -224,6 +250,7 @@ export const useTierList = (tierListId) => {
                 }));
             }
         }
+        
         setActiveDragItem(null);
     };
 

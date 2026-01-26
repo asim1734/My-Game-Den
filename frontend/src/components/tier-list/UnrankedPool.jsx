@@ -14,8 +14,8 @@ export const UnrankedPool = ({ games, id = "unranked" }) => {
     return (
         <Box 
             bg="gray.900"
-            borderTop="1px solid" 
-            borderColor="whiteAlpha.300"
+            // borderTop="1px solid" 
+            // borderColor="whiteAlpha.300"
             boxShadow="0px -4px 20px rgba(0,0,0,0.5)"
             h="auto"
             minH="200px" 
