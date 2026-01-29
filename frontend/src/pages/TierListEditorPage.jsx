@@ -3,12 +3,13 @@ import { useParams } from "react-router-dom";
 import { 
     Box, Flex, Heading, Button, HStack, useToast 
 } from "@chakra-ui/react";
-import { FaPlus, FaSave, FaTimes, FaDownload } from "react-icons/fa"; 
+import { FaPlus, FaSave, FaTimes } from "react-icons/fa"; // Removed FaDownload
 import { 
     DndContext, DragOverlay, pointerWithin, 
     useSensor, useSensors, PointerSensor, KeyboardSensor 
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { FaDownload } from "react-icons/fa";
 
 // --- COMPONENTS ---
 import { GamePickerSidebar } from "../components/tier-list/GamePickerSidebar";
@@ -32,21 +33,15 @@ export const TierListEditorPage = () => {
         itemsLoaded,
         activeDragItem,
         sensors,
+        tierDefs,
         handleDragStart,
         handleDragOver,
         handleDragEnd,
         handleAddGame,
         handleSave,
-        downloadImage 
+        downloadImage,
+        handleUpdateTier
     } = useTierList(id); 
-
-    const tiersConfig = [
-        { id: 'S', label: 'S', color: '#ff7f7f' },
-        { id: 'A', label: 'A', color: '#ffbf7f' },
-        { id: 'B', label: 'B', color: '#ffff7f' },
-        { id: 'C', label: 'C', color: '#7fff7f' },
-        { id: 'D', label: 'D', color: '#7fbfff' },
-    ];
 
     if (!itemsLoaded) {
         return <Box p={10} color="white">Loading Tier List...</Box>;
@@ -77,16 +72,6 @@ export const TierListEditorPage = () => {
                         </Heading>
                         <HStack>
                             <Button 
-                                leftIcon={<FaDownload />} 
-                                size="xs" 
-                                colorScheme="blue" 
-                                variant="outline" 
-                                onClick={() => downloadImage("tier-list-board")}
-                            >
-                                Export
-                            </Button>
-
-                            <Button 
                                 leftIcon={isSidebarOpen ? <FaTimes /> : <FaPlus />} 
                                 colorScheme={isSidebarOpen ? "gray" : "purple"} 
                                 variant={isSidebarOpen ? "ghost" : "solid"} 
@@ -105,6 +90,15 @@ export const TierListEditorPage = () => {
                             >
                                 Save
                             </Button>
+                            <Button 
+                                leftIcon={<FaDownload />} 
+                                size="xs" 
+                                colorScheme="blue" 
+                                variant="outline" 
+                                onClick={() => downloadImage("tier-list-board")}
+                            >
+                                Export
+                            </Button>
                         </HStack>
                     </HStack>
 
@@ -118,13 +112,14 @@ export const TierListEditorPage = () => {
                         minH="0" 
                         css={{ '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.2)', borderRadius: '4px' } }}
                     >
-                        {tiersConfig.map((tier) => (
+                        {tierDefs.map((tier) => (
                             <TierRow 
                                 key={tier.id} 
                                 id={tier.id} 
                                 label={tier.label} 
                                 color={tier.color} 
                                 games={items[tier.id]} 
+                                onUpdate={handleUpdateTier}
                             />
                         ))}
                         <Box h="20px" /> 

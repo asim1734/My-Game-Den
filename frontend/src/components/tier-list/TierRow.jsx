@@ -1,162 +1,136 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
-    Box, Flex, Text, IconButton, Popover, PopoverTrigger, PopoverContent, 
-    PopoverBody, PopoverArrow, VStack, Input, HStack, SimpleGrid 
+    Box, Text, IconButton, Flex, Popover, PopoverTrigger, 
+    PopoverContent, PopoverBody, PopoverArrow, Input, VStack, HStack 
 } from "@chakra-ui/react";
-import { SettingsIcon, DeleteIcon, ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { FaCog } from "react-icons/fa";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { SortableGameCard } from "./SortableGameCard";
 
-// Predefined colors for the picker
-const COLORS = [
-    "#ff7f7f", "#ffbf7f", "#ffff7f", "#7fff7f", "#7fbfff", 
-    "#d69e2e", "#805ad5", "#f687b3", "#cbd5e0", "#2d3748"
-];
+export const TierRow = ({ id, label, color, games, onUpdate }) => {
+    const { setNodeRef } = useDroppable({ id });
+    const [tempLabel, setTempLabel] = useState(label);
 
-export const TierRow = ({ 
-    id, label, color, games, 
-    onUpdate, onDelete, onMoveUp, onMoveDown, isFirst, isLast 
-}) => {
-    const { setNodeRef, isOver } = useDroppable({
-        id: id,
-        data: { type: "container", id: id }
-    });
+    const handleColorChange = (newColor) => {
+        onUpdate(id, { color: newColor });
+    };
+
+    const handleLabelBlur = () => {
+        if (tempLabel.trim() !== "") {
+            onUpdate(id, { label: tempLabel });
+        } else {
+            setTempLabel(label); 
+        }
+    };
+
+    // --- 3-STAGE FONT SCALING ---
+    let fontSize = "xl"; // Default for S, A, B (1-2 chars)
+    if (label.length > 6) {
+        fontSize = "xs"; // Long words (Unsatisfactory)
+    } else if (label.length > 2) {
+        fontSize = "sm"; // Medium words (GOATED, Trash)
+    }
 
     return (
-        <Flex 
-            minH="95px" 
-            bg="blackAlpha.400" 
-            mb={1} 
-            borderRadius="md" 
-            overflow="visible" // Allow popover to escape if needed
-            border="2px solid" 
-            borderColor={isOver ? "red.500" : "whiteAlpha.100"}
-            boxShadow={isOver ? "0 0 10px rgba(255, 0, 0, 0.3)" : "none"}
-            transition="all 0.2s"
-        >
-            {/* LABEL & SETTINGS AREA */}
-            <Popover placement="right-start" isLazy>
+        <Flex mb={2} bg="blackAlpha.400" borderRadius="md" overflow="hidden" minH="100px">
+            {/* TIER LABEL (Left Side) */}
+            <Popover placement="right-start">
                 <PopoverTrigger>
                     <Box 
-                        w="70px" 
+                        w="80px" 
                         bg={color} 
+                        position="relative" 
                         display="flex" 
                         flexDirection="column"
                         alignItems="center" 
                         justifyContent="center" 
-                        flexShrink={0}
+                        p={1} // Tighter padding
                         cursor="pointer"
+                        _hover={{ filter: "brightness(1.1)" }}
                         role="group"
-                        position="relative"
                     >
                         <Text 
-                            fontWeight="bold" 
                             color="black" 
-                            fontSize={label.length > 3 ? "sm" : "xl"} 
+                            fontWeight="900" // Extra Bold
+                            fontSize={fontSize} // Apply scaled size
                             textAlign="center"
-                            wordBreak="break-word"
-                            px={1}
+                            lineHeight="1.1"
+                            textTransform="uppercase"
+                            // Use 'break-word' to prevent splitting words unless absolutely necessary
+                            wordBreak="normal" 
+                            overflowWrap="break-word"
                         >
                             {label}
                         </Text>
                         
-                        {/* Hover Overlay Icon */}
-                        <Box 
-                            position="absolute" 
-                            inset={0} 
-                            bg="blackAlpha.600" 
-                            display="none" 
-                            alignItems="center" 
-                            justifyContent="center"
-                            _groupHover={{ display: "flex" }}
-                        >
-                            <SettingsIcon color="white" />
-                        </Box>
+                        {/* Settings Icon (Absolute Position) */}
+                        <IconButton 
+                            icon={<FaCog />} 
+                            size="xs" 
+                            variant="ghost" 
+                            color="blackAlpha.600"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            opacity={0}
+                            _groupHover={{ opacity: 1 }}
+                            aria-label="Edit Tier"
+                            zIndex={2}
+                            h="20px"
+                            minW="20px"
+                        />
                     </Box>
                 </PopoverTrigger>
                 
-                <PopoverContent bg="gray.800" borderColor="gray.600" w="240px">
-                    <PopoverArrow bg="gray.800" />
+                {/* POPUP MENU */}
+                <PopoverContent w="200px" bg="gray.700" borderColor="gray.600" onClick={e => e.stopPropagation()}>
+                    <PopoverArrow bg="gray.700" />
                     <PopoverBody>
-                        <VStack spacing={3} align="stretch">
-                            <Box>
+                        <VStack spacing={3}>
+                            <Box w="full">
                                 <Text fontSize="xs" color="gray.400" mb={1}>Label</Text>
                                 <Input 
                                     size="sm" 
-                                    value={label} 
-                                    onChange={(e) => onUpdate(id, { label: e.target.value })} 
+                                    value={tempLabel}
+                                    onChange={(e) => setTempLabel(e.target.value)}
+                                    onBlur={handleLabelBlur}
+                                    onKeyDown={(e) => e.stopPropagation()} 
+                                    color="white"
                                 />
                             </Box>
-                            
-                            <Box>
+                            <Box w="full">
                                 <Text fontSize="xs" color="gray.400" mb={1}>Color</Text>
-                                <SimpleGrid columns={5} spacing={1}>
-                                    {COLORS.map(c => (
+                                <HStack spacing={2} wrap="wrap">
+                                    {['#ff7f7f', '#ffbf7f', '#ffff7f', '#7fff7f', '#7fbfff', '#d67fff', '#ff7fbf'].map(c => (
                                         <Box 
                                             key={c} 
-                                            w="6" h="6" 
+                                            w="20px" h="20px" 
                                             bg={c} 
                                             borderRadius="full" 
                                             cursor="pointer"
                                             border={color === c ? "2px solid white" : "none"}
-                                            onClick={() => onUpdate(id, { color: c })}
+                                            onClick={() => handleColorChange(c)}
                                         />
                                     ))}
-                                </SimpleGrid>
-                            </Box>
-
-                            <HStack justify="space-between">
-                                <HStack>
-                                    <IconButton 
-                                        icon={<ChevronUpIcon />} 
-                                        size="xs" 
-                                        isDisabled={isFirst}
-                                        onClick={onMoveUp}
-                                        aria-label="Move Up"
-                                    />
-                                    <IconButton 
-                                        icon={<ChevronDownIcon />} 
-                                        size="xs" 
-                                        isDisabled={isLast}
-                                        onClick={onMoveDown}
-                                        aria-label="Move Down"
-                                    />
                                 </HStack>
-                                <IconButton 
-                                    icon={<DeleteIcon />} 
-                                    size="xs" 
-                                    colorScheme="red" 
-                                    onClick={() => onDelete(id)}
-                                    aria-label="Delete Row"
-                                />
-                            </HStack>
+                            </Box>
                         </VStack>
                     </PopoverBody>
                 </PopoverContent>
             </Popover>
 
-            {/* DROP ZONE */}
-            <Box ref={setNodeRef} flex={1} p={2} w="full">
-                <SortableContext 
-                    id={id} 
-                    items={games.map(g => g.igdbId || g.id)} 
-                    strategy={rectSortingStrategy}
-                >
-                    <Flex gap={2} flexWrap="wrap" alignItems="center" w="full" h="full">
-                        {games.length === 0 ? (
-                            <Text color="whiteAlpha.200" fontSize="sm" w="full" h="full" display="flex" alignItems="center" pl={2}>
-                                Drop here
-                            </Text>
-                        ) : (
-                            games.map((game) => (
-                                <SortableGameCard 
-                                    key={game.igdbId || game.id} 
-                                    id={game.igdbId || game.id} 
-                                    game={game} 
-                                />
-                            ))
-                        )}
+            {/* GAMES AREA */}
+            <Box ref={setNodeRef} flex={1} p={2} minW="0">
+                <SortableContext id={id} items={games.map(g => g.igdbId || g.id)} strategy={rectSortingStrategy}>
+                    <Flex wrap="wrap" gap={2}>
+                        {games.map((game) => (
+                            <SortableGameCard 
+                                key={game.igdbId || game.id} 
+                                id={game.igdbId || game.id} 
+                                game={game} 
+                            />
+                        ))}
                     </Flex>
                 </SortableContext>
             </Box>
