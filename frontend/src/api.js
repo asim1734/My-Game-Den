@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -14,7 +15,7 @@ api.interceptors.request.use(
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -26,7 +27,7 @@ api.interceptors.response.use(
             window.dispatchEvent(new Event("force-logout"));
         }
         return Promise.reject(error);
-    }
+    },
 );
 
 // --- Dashboard Fetchers ---
@@ -78,12 +79,16 @@ export const deleteList = async (listName) => {
 
 // --- Game-in-List Management ---
 export const addGameToList = async ({ listName, gameId }) => {
-    const { data } = await api.post(`/users/lists/${listName}/games`, { gameId });
+    const { data } = await api.post(`/users/lists/${listName}/games`, {
+        gameId,
+    });
     return data;
 };
 
 export const removeGameFromList = async ({ listName, gameId }) => {
-    const { data } = await api.delete(`/users/lists/${listName}/games/${gameId}`);
+    const { data } = await api.delete(
+        `/users/lists/${listName}/games/${gameId}`,
+    );
     return data;
 };
 
@@ -96,10 +101,10 @@ export const fetchGameById = async (gameId) => {
 
 export const searchGames = async (searchTerm, filters = {}) => {
     if (!searchTerm || searchTerm.trim() === "") return [];
-    
-    const params = { 
+
+    const params = {
         term: searchTerm,
-        ...filters 
+        ...filters,
     };
 
     const { data } = await api.get(`/games/search`, { params });
@@ -114,9 +119,11 @@ export const browseGames = async (filters) => {
     };
 
     if (filters.genre?.length > 0) params.genre = filters.genre.join(",");
-    if (filters.platform?.length > 0) params.platform = filters.platform.join(",");
+    if (filters.platform?.length > 0)
+        params.platform = filters.platform.join(",");
     if (filters.minRating) params.minRating = filters.minRating;
-    if (filters.releaseYearStart) params.releaseYearStart = filters.releaseYearStart;
+    if (filters.releaseYearStart)
+        params.releaseYearStart = filters.releaseYearStart;
     if (filters.releaseYearEnd) params.releaseYearEnd = filters.releaseYearEnd;
 
     const { data } = await api.get(`/games/browse`, { params });
@@ -150,6 +157,11 @@ export const fetchCommunityReviewsForGame = async (gameId) => {
 
 export const getMyTierLists = async () => {
     const res = await api.get("/tierlists/my-lists");
+    return res.data;
+};
+
+export const getTierLists = async () => {
+    const res = await api.get("/tierlists/my");
     return res.data;
 };
 

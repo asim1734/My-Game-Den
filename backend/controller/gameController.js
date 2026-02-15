@@ -206,15 +206,15 @@ exports.searchGames = async (req, res) => {
 
         const whereString = whereClauses.join(" & ");
         const limit = 24;
-const offset = (parseInt(page) - 1) * limit;
+        const offset = (parseInt(page) - 1) * limit;
 
-const queryString = `
-    fields name, cover.url, first_release_date, total_rating, total_rating_count, game_type;
-    where ${whereString};
-    sort ${sortBy} ${sortOrder};
-    limit ${limit};
-    offset ${offset}; 
-`;
+        const queryString = `
+            fields name, cover.url, first_release_date, total_rating, total_rating_count, game_type;
+            where ${whereString};
+            sort ${sortBy} ${sortOrder};
+            limit ${limit};
+            offset ${offset}; 
+        `;
 
         const rawGames = await fetchFromIGDB("games", queryString, `Sorted Search: ${term}`);
         res.status(200).json(rawGames.map(mapGameData));
