@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SimpleGrid,
     Box,
@@ -10,19 +10,54 @@ import {
     Icon,
     Center,
     Spinner,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    IconButton,
+    useDisclosure,
+    Portal,
 } from "@chakra-ui/react";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaLayerGroup, FaEllipsisV, FaPen, FaTrash } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { getTierLists } from "../../api";
+import { RenameTierListModal } from "./RenameTierListModal";
+import { DeleteTierListAlert } from "./DeleteTierListAlert";
 
 export const TierListsTab = () => {
     const navigate = useNavigate();
+
+    const [selectedTierList, setSelectedTierList] = useState(null);
+
+    const {
+        isOpen: isRenameOpen,
+        onOpen: onRenameOpen,
+        onClose: onRenameClose,
+    } = useDisclosure();
+
+    const {
+        isOpen: isDeleteOpen,
+        onOpen: onDeleteOpen,
+        onClose: onDeleteClose,
+    } = useDisclosure();
 
     const { data: tierLists, isLoading } = useQuery({
         queryKey: ["my-tierlists"],
         queryFn: getTierLists,
     });
+
+    const handleRenameClick = (e, list) => {
+        e.stopPropagation();
+        setSelectedTierList(list);
+        onRenameOpen();
+    };
+
+    const handleDeleteClick = (e, list) => {
+        e.stopPropagation();
+        setSelectedTierList(list);
+        onDeleteOpen();
+    };
 
     if (isLoading) {
         return (
@@ -55,6 +90,7 @@ export const TierListsTab = () => {
                                 borderColor="brand.700"
                                 cursor="pointer"
                                 transition="all 0.2s"
+                                position="relative"
                                 _hover={{
                                     transform: "translateY(-4px)",
                                     borderColor: "purple.500",
@@ -65,24 +101,92 @@ export const TierListsTab = () => {
                                 }
                             >
                                 <VStack align="start" spacing={3}>
-                                    <HStack justify="space-between" w="full">
-                                        <Icon
-                                            as={FaLayerGroup}
-                                            color="purple.400"
-                                            boxSize={5}
-                                        />
-                                        <Badge
-                                            colorScheme={
-                                                list.isPublic ? "green" : "gray"
-                                            }
-                                            variant="subtle"
-                                            borderRadius="full"
-                                            px={2}
-                                        >
-                                            {list.isPublic
-                                                ? "Public"
-                                                : "Private"}
-                                        </Badge>
+                                    <HStack
+                                        justify="space-between"
+                                        w="full"
+                                        align="flex-start"
+                                    >
+                                        <HStack>
+                                            <Icon
+                                                as={FaLayerGroup}
+                                                color="purple.400"
+                                                boxSize={5}
+                                            />
+                                            <Badge
+                                                colorScheme={
+                                                    list.isPublic
+                                                        ? "green"
+                                                        : "gray"
+                                                }
+                                                variant="subtle"
+                                                borderRadius="full"
+                                                px={2}
+                                            >
+                                                {list.isPublic
+                                                    ? "Public"
+                                                    : "Private"}
+                                            </Badge>
+                                        </HStack>
+
+                                        <Menu isLazy>
+                                            <MenuButton
+                                                as={IconButton}
+                                                icon={<FaEllipsisV />}
+                                                variant="ghost"
+                                                size="xs"
+                                                color="gray.400"
+                                                _hover={{
+                                                    color: "white",
+                                                    bg: "whiteAlpha.200",
+                                                }}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            />
+                                            <Portal>
+                                                <MenuList
+                                                    bg="brand.900"
+                                                    borderColor="brand.700"
+                                                    boxShadow="dark-lg"
+                                                    zIndex="popover"
+                                                >
+                                                    <MenuItem
+                                                        icon={<FaPen />}
+                                                        bg="brand.900"
+                                                        fontSize="sm"
+                                                        _hover={{
+                                                            bg: "brand.700",
+                                                        }}
+                                                        onClick={(e) =>
+                                                            handleRenameClick(
+                                                                e,
+                                                                list,
+                                                            )
+                                                        }
+                                                    >
+                                                        Rename Tier List
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        icon={<FaTrash />}
+                                                        bg="brand.900"
+                                                        color="red.300"
+                                                        fontSize="sm"
+                                                        _hover={{
+                                                            bg: "red.900",
+                                                            color: "white",
+                                                        }}
+                                                        onClick={(e) =>
+                                                            handleDeleteClick(
+                                                                e,
+                                                                list,
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete Tier List
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Portal>
+                                        </Menu>
                                     </HStack>
 
                                     <Box w="full">
@@ -121,6 +225,22 @@ export const TierListsTab = () => {
                         </Text>
                     </VStack>
                 </Center>
+            )}
+
+            {selectedTierList && (
+                <RenameTierListModal
+                    isOpen={isRenameOpen}
+                    onClose={onRenameClose}
+                    tierList={selectedTierList}
+                />
+            )}
+
+            {selectedTierList && (
+                <DeleteTierListAlert
+                    isOpen={isDeleteOpen}
+                    onClose={onDeleteClose}
+                    tierList={selectedTierList}
+                />
             )}
         </Box>
     );
