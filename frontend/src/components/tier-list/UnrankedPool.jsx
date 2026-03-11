@@ -1,65 +1,93 @@
 import React from "react";
-import { Box, Flex, Text, HStack } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { SortableGameCard } from "./SortableGameCard";
+import { TrashZone } from "./TrashZone";
 
-export const UnrankedPool = ({ games, id = "unranked" }) => {
-    // 1. Make this pool a droppable zone
+export const UnrankedPool = ({ games, id = "unranked", onRemove }) => {
     const { setNodeRef } = useDroppable({
-        id: id,
-        data: { type: "container", id: id }
+        id,
+        data: { type: "container", id },
     });
 
     return (
-        <Box 
-            bg="gray.900"
-            // borderTop="1px solid" 
-            // borderColor="whiteAlpha.300"
-            boxShadow="0px -4px 20px rgba(0,0,0,0.5)"
-            h="auto"
-            minH="200px" 
-            w="full"
-            p={4}
-            pb={10} 
-            display="flex"
-            flexDirection="column"
-            zIndex={10}
+        <Flex
+            mb={2}
+            bg="blackAlpha.400"
+            borderRadius="md"
+            overflow="hidden"
+            minH="100px"
         >
-            <HStack justify="space-between" mb={3}>
-                <Text color="purple.200" fontSize="10px" fontWeight="bold" letterSpacing="wider">
-                    UNRANKED POOL ({games.length})
-                </Text>
-            </HStack>
-
-            {/* 2. The Context enables sorting for items inside */}
-            <Box ref={setNodeRef} flex={1}>
-                <SortableContext 
-                    id={id} 
-                    items={games.map(g => g.igdbId || g.id)} 
-                    strategy={rectSortingStrategy} // Better for grids
+            {/* Left label — matches TierRow label column */}
+            <Box
+                w="80px"
+                bg="gray.700"
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                p={1}
+                flexShrink={0}
+            >
+                <Text
+                    color="gray.300"
+                    fontWeight="900"
+                    fontSize="xs"
+                    textAlign="center"
+                    textTransform="uppercase"
+                    lineHeight="1.1"
                 >
-                    <Flex 
-                        gap={3} 
-                        wrap="wrap" 
-                        alignContent="flex-start"
-                    >
+                    UNRANKED
+                </Text>
+                <Text color="gray.500" fontSize="9px" textAlign="center" mt={1}>
+                    {games.length} game{games.length !== 1 ? "s" : ""}
+                </Text>
+            </Box>
+
+            {/* Games area — matches TierRow games column */}
+            <Box ref={setNodeRef} flex={1} p={2} minW="0">
+                <SortableContext
+                    id={id}
+                    items={games.map((g) => g.igdbId || g.id)}
+                    strategy={rectSortingStrategy}
+                >
+                    <Flex wrap="wrap" gap={2} minH="80px" align="center">
                         {games.length === 0 ? (
-                            <Text color="gray.600" fontSize="xs" w="full" textAlign="center" mt={8}>
-                                Pool is empty. Add games from the sidebar!
+                            <Text
+                                fontSize="xs"
+                                color="gray.700"
+                                fontStyle="italic"
+                                userSelect="none"
+                                pl={1}
+                                data-export-hide="true"
+                            >
+                                Add games from the sidebar!
                             </Text>
                         ) : (
-                            games.map(game => (
-                                <SortableGameCard 
-                                    key={game.igdbId || game.id} 
-                                    id={game.igdbId || game.id} 
-                                    game={game} 
+                            games.map((game) => (
+                                <SortableGameCard
+                                    key={game.igdbId || game.id}
+                                    id={game.igdbId || game.id}
+                                    game={game}
+                                    onRemove={onRemove}
                                 />
                             ))
                         )}
                     </Flex>
                 </SortableContext>
             </Box>
-        </Box>
+
+            {/* Trash zone — inline at the end of the pool */}
+            <Flex
+                align="center"
+                justify="center"
+                px={3}
+                flexShrink={0}
+                data-export-hide="true"
+            >
+                <TrashZone />
+            </Flex>
+        </Flex>
     );
 };

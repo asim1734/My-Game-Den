@@ -16,10 +16,10 @@ import {
     HStack,
     Image,
     Input,
-    InputGroup, 
-    InputLeftElement, 
+    InputGroup,
+    InputLeftElement,
 } from "@chakra-ui/react";
-import { FaSearch } from "react-icons/fa"; 
+import { FaSearch } from "react-icons/fa";
 
 const NavLink = ({ to, children }) => {
     const location = useLocation();
@@ -29,11 +29,11 @@ const NavLink = ({ to, children }) => {
         <Button
             as={RouterLink}
             to={to}
-            variant="ghost" 
+            variant="ghost"
             color="brand.300"
             borderBottom="2px solid"
             borderColor={isActive ? "brand.500" : "transparent"}
-            borderRadius="0" 
+            borderRadius="0"
             mx="2"
         >
             {children}
@@ -94,10 +94,10 @@ export function RootLayout() {
                 borderColor="brand.700"
             >
                 {/* Logo/Brand */}
-                <Box 
-                    as={RouterLink} 
-                    to="/" 
-                    transition="opacity 0.2s" 
+                <Box
+                    as={RouterLink}
+                    to="/"
+                    transition="opacity 0.2s"
                     _hover={{ opacity: 0.8 }}
                 >
                     <Image
@@ -137,7 +137,7 @@ export function RootLayout() {
                                 bg: "brand.700",
                                 borderColor: "brand.500",
                             }}
-                            pl="2.5rem" 
+                            pl="2.5rem"
                         />
                     </InputGroup>
 
@@ -167,7 +167,7 @@ export function RootLayout() {
                                 Welcome, {username}
                             </Text>
                             <Button
-                                colorScheme="purple" 
+                                colorScheme="purple"
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
@@ -188,7 +188,7 @@ export function RootLayout() {
                             <Button
                                 as={RouterLink}
                                 to="/register"
-                                colorScheme="purple" 
+                                colorScheme="purple"
                                 size="sm"
                             >
                                 Register
@@ -201,17 +201,6 @@ export function RootLayout() {
             {/* --- Main Content Area --- */}
             <Box p="4" flex="1">
                 <Outlet />
-            </Box>
-
-            {/* --- Footer --- */}
-            <Box
-                as="footer"
-                p="4"
-                bg="brand.800"
-                color="gray.400"
-                textAlign="center"
-            >
-                © {new Date().getFullYear()} My Game Den. All rights reserved.
             </Box>
         </Flex>
     );

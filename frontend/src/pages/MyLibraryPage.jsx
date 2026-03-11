@@ -1,9 +1,25 @@
-import React, { useState } from "react";
-import { 
-    Box, Container, Heading, Tabs, TabList, TabPanels, Tab, TabPanel, 
-    Button, HStack, useDisclosure, Icon 
+import React from "react";
+import {
+    Box,
+    Container,
+    Heading,
+    Tabs,
+    TabList,
+    TabPanels,
+    Tab,
+    TabPanel,
+    Button,
+    HStack,
+    useDisclosure,
+    Icon,
 } from "@chakra-ui/react";
-import { FaPlus, FaLayerGroup, FaListUl, FaSortAmountDown } from "react-icons/fa";
+import {
+    FaPlus,
+    FaLayerGroup,
+    FaListUl,
+    FaSortAmountDown,
+} from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
 
 // Import BOTH modals
 import { CreateTierListModal } from "../components/tier-list/CreateTierListModal";
@@ -12,10 +28,17 @@ import { CreateCollectionModal } from "../components/library/CreateCollectionMod
 import { CollectionsTab } from "../components/library/CollectionsTab";
 import { TierListsTab } from "../components/library/TierListsTab";
 
+const TAB_NAMES = ["collections", "tierlists", "rankings"];
+
 export const MyLibraryPage = () => {
-    // Track which tab is active (0 = Collections, 1 = Tier Lists, 2 = Rankings)
-    const [tabIndex, setTabIndex] = useState(0);
-    
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Derive tab index from URL param; default to 0 (Collections)
+    const tabParam = searchParams.get("tab");
+    const tabIndex = TAB_NAMES.includes(tabParam)
+        ? TAB_NAMES.indexOf(tabParam)
+        : 0;
+
     // Manage Modal State
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -30,28 +53,42 @@ export const MyLibraryPage = () => {
         <Container maxW="container.xl" py={8}>
             <HStack justify="space-between" mb={8} align="center">
                 <Box>
-                    <Heading size="xl" color="white">My Library</Heading>
-                    <Heading size="xs" color="gray.500" mt={1}>Manage your collections and rankings</Heading>
+                    <Heading size="xl" color="white">
+                        My Library
+                    </Heading>
+                    <Heading size="xs" color="gray.500" mt={1}>
+                        Manage your collections and rankings
+                    </Heading>
                 </Box>
             </HStack>
 
-            {/* onChange updates our state so we know which modal to open */}
-            <Tabs variant="soft-rounded" colorScheme="purple" onChange={(index) => setTabIndex(index)}>
+            <Tabs
+                variant="soft-rounded"
+                colorScheme="purple"
+                index={tabIndex}
+                onChange={(index) => setSearchParams({ tab: TAB_NAMES[index] })}
+            >
                 <HStack justify="space-between" mb={6}>
                     <TabList bg="brand.800" p={1} borderRadius="full">
-                        <Tab px={6} gap={2}><Icon as={FaListUl} /> Collections</Tab>
-                        <Tab px={6} gap={2}><Icon as={FaLayerGroup} /> Tier Lists</Tab>
-                        <Tab px={6} gap={2}><Icon as={FaSortAmountDown} /> Rankings</Tab>
+                        <Tab px={6} gap={2}>
+                            <Icon as={FaListUl} /> Collections
+                        </Tab>
+                        <Tab px={6} gap={2}>
+                            <Icon as={FaLayerGroup} /> Tier Lists
+                        </Tab>
+                        <Tab px={6} gap={2}>
+                            <Icon as={FaSortAmountDown} /> Rankings
+                        </Tab>
                     </TabList>
 
                     {/* The Smart Button */}
-                    <Button 
-                        leftIcon={<FaPlus />} 
-                        colorScheme="purple" 
+                    <Button
+                        leftIcon={<FaPlus />}
+                        colorScheme="purple"
                         borderRadius="full"
                         onClick={onOpen}
                         // Disable button for "Rankings" tab since it's not ready
-                        isDisabled={tabIndex === 2} 
+                        isDisabled={tabIndex === 2}
                     >
                         {getButtonLabel()}
                     </Button>
@@ -70,8 +107,16 @@ export const MyLibraryPage = () => {
 
                     {/* Tab 2: Rankings (Placeholder) */}
                     <TabPanel p={0}>
-                        <Box py={10} textAlign="center" border="2px dashed" borderColor="brand.700" borderRadius="xl">
-                            <Heading size="sm" color="gray.500">Ranked Lists (Coming Soon)</Heading>
+                        <Box
+                            py={10}
+                            textAlign="center"
+                            border="2px dashed"
+                            borderColor="brand.700"
+                            borderRadius="xl"
+                        >
+                            <Heading size="sm" color="gray.500">
+                                Ranked Lists (Coming Soon)
+                            </Heading>
                         </Box>
                     </TabPanel>
                 </TabPanels>
@@ -81,7 +126,7 @@ export const MyLibraryPage = () => {
             {tabIndex === 0 && (
                 <CreateCollectionModal isOpen={isOpen} onClose={onClose} />
             )}
-            
+
             {tabIndex === 1 && (
                 <CreateTierListModal isOpen={isOpen} onClose={onClose} />
             )}

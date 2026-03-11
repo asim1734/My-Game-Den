@@ -4,27 +4,28 @@ import { CSS } from "@dnd-kit/utilities";
 import { TierGameCard } from "./TierGameCard";
 import { Box } from "@chakra-ui/react";
 
-export const SortableGameCard = ({ game, id }) => {
+export const SortableGameCard = ({ game, id, onRemove }) => {
     const {
         attributes,
         listeners,
         setNodeRef,
         transform,
         transition,
-        isDragging
+        isDragging,
     } = useSortable({ id });
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.4 : 1, 
+        transition: isDragging ? undefined : transition,
+        opacity: isDragging ? 0.4 : 1,
         zIndex: isDragging ? 999 : "auto",
-        touchAction: "none" 
+        touchAction: "none",
+        willChange: isDragging ? "transform" : "auto",
     };
 
     return (
         <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <TierGameCard game={game} variant="board" />
+            <TierGameCard game={game} variant="board" onRemove={onRemove} />
         </Box>
     );
 };
