@@ -26,6 +26,7 @@ const genreOptions = [
     "MOBA",
     "Simulator",
 ];
+
 const platformOptions = [
     "PC",
     "PS5",
@@ -34,41 +35,24 @@ const platformOptions = [
     "Xbox One",
     "Switch",
 ];
+
 const currentYear = new Date().getFullYear();
 
-export const FilterSidebar = ({
-    initialFilters,
-    onApplyFilters,
-    isFetching,
-}) => {
-    const [localFilters, setLocalFilters] = useState(initialFilters);
+export const FilterSidebar = ({ filters, onFilterChange, onClearAll }) => {
+    // Local state only for number inputs — apply on blur to avoid
+    // firing a request on every keystroke
+    const [localRating, setLocalRating] = useState(filters.minRating);
+    const [localYearStart, setLocalYearStart] = useState(
+        filters.releaseYearStart,
+    );
+    const [localYearEnd, setLocalYearEnd] = useState(filters.releaseYearEnd);
 
+    // Sync local inputs when URL changes (e.g. after clearing all)
     useEffect(() => {
-        setLocalFilters(initialFilters);
-    }, [initialFilters]);
-
-    const handleLocalFilterChange = (name, value) => {
-        setLocalFilters((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    const handleClearFilters = () => {
-        setLocalFilters({
-            genre: [],
-            platform: [],
-            minRating: "",
-            releaseYearStart: "",
-            releaseYearEnd: "",
-            sortBy: "total_rating_count",
-            sortOrder: "desc",
-            page: 1,
-        });
-        // Passing an empty object to onApplyFilters might reset all external filters
-        // If specific default values are needed, they should be passed here.
-        onApplyFilters({});
-    };
+        setLocalRating(filters.minRating);
+        setLocalYearStart(filters.releaseYearStart);
+        setLocalYearEnd(filters.releaseYearEnd);
+    }, [filters.minRating, filters.releaseYearStart, filters.releaseYearEnd]);
 
     return (
         <VStack
@@ -77,28 +61,27 @@ export const FilterSidebar = ({
             position="sticky"
             top="100px"
             h="calc(100vh - 120px)"
-            overflowY="auto" // Main scrollbar for the whole sidebar
-            p={4} // Added padding to the entire sidebar
-            pb={6} // Extra bottom padding for buttons
-            borderRightWidth="1px" // Optional: Add a subtle border for separation
-            borderColor="gray.700" // Optional: Border color
+            overflowY="auto"
+            p={4}
+            pb={6}
+            borderRightWidth="1px"
+            borderColor="gray.700"
         >
             <Heading size="md" mb={2}>
                 Filters
-            </Heading>{" "}
-            {/* Increased bottom margin for heading */}
-            {/* Genre Filter */}
+            </Heading>
+
+            {/* Genre */}
             <Box>
                 <Text fontWeight="bold" mb={2}>
                     Genres
                 </Text>
                 <CheckboxGroup
                     colorScheme="purple"
-                    value={localFilters.genre}
-                    onChange={(val) => handleLocalFilterChange("genre", val)}
+                    value={filters.genre}
+                    onChange={(val) => onFilterChange("genre", val)}
                 >
                     <VStack align="start" spacing={1}>
-                        {/* Removed maxH and overflowY from inner Vstack for genre */}
                         {genreOptions.map((g) => (
                             <Checkbox key={g} value={g}>
                                 {g}
@@ -107,15 +90,16 @@ export const FilterSidebar = ({
                     </VStack>
                 </CheckboxGroup>
             </Box>
-            {/* Platform Filter */}
+
+            {/* Platform */}
             <Box>
                 <Text fontWeight="bold" mb={2}>
                     Platforms
                 </Text>
                 <CheckboxGroup
                     colorScheme="purple"
-                    value={localFilters.platform}
-                    onChange={(val) => handleLocalFilterChange("platform", val)}
+                    value={filters.platform}
+                    onChange={(val) => onFilterChange("platform", val)}
                 >
                     <VStack align="start" spacing={1}>
                         {platformOptions.map((p) => (
@@ -126,23 +110,24 @@ export const FilterSidebar = ({
                     </VStack>
                 </CheckboxGroup>
             </Box>
-            {/* Min. Rating Filter */}
+
+            {/* Min Rating */}
             <Box>
                 <Text fontWeight="bold" mb={2}>
-                    Min. Rating (0-100)
+                    Min. Rating (0–100)
                 </Text>
                 <NumberInput
                     min={0}
                     max={100}
-                    value={localFilters.minRating}
-                    onChange={(val) =>
-                        handleLocalFilterChange("minRating", val)
-                    }
+                    value={localRating}
+                    onChange={setLocalRating}
+                    onBlur={() => onFilterChange("minRating", localRating)}
                 >
-                    <NumberInputField placeholder="e.g., 75" />
+                    <NumberInputField placeholder="e.g. 75" />
                 </NumberInput>
             </Box>
-            {/* Release Year Filter */}
+
+            {/* Release Year */}
             <Box>
                 <Text fontWeight="bold" mb={2}>
                     Release Year
@@ -155,12 +140,16 @@ export const FilterSidebar = ({
                         <NumberInput
                             min={1980}
                             max={currentYear}
-                            value={localFilters.releaseYearStart}
-                            onChange={(val) =>
-                                handleLocalFilterChange("releaseYearStart", val)
+                            value={localYearStart}
+                            onChange={setLocalYearStart}
+                            onBlur={() =>
+                                onFilterChange(
+                                    "releaseYearStart",
+                                    localYearStart,
+                                )
                             }
                         >
-                            <NumberInputField placeholder="e.g., 2018" />
+                            <NumberInputField placeholder="e.g. 2018" />
                         </NumberInput>
                     </FormControl>
                     <FormControl>
@@ -170,31 +159,24 @@ export const FilterSidebar = ({
                         <NumberInput
                             min={1980}
                             max={currentYear + 5}
-                            value={localFilters.releaseYearEnd}
-                            onChange={(val) =>
-                                handleLocalFilterChange("releaseYearEnd", val)
+                            value={localYearEnd}
+                            onChange={setLocalYearEnd}
+                            onBlur={() =>
+                                onFilterChange("releaseYearEnd", localYearEnd)
                             }
                         >
-                            <NumberInputField placeholder="e.g., 2025" />
+                            <NumberInputField placeholder="e.g. 2025" />
                         </NumberInput>
                     </FormControl>
                 </HStack>
             </Box>
-            <Button
-                colorScheme="purple"
-                size="lg"
-                py={4}
-                onClick={() => onApplyFilters(localFilters)}
-                isLoading={isFetching}
-                mt={4}
-            >
-                Apply Filters
-            </Button>
+
             <Button
                 variant="outline"
                 size="lg"
                 py={4}
-                onClick={handleClearFilters}
+                onClick={onClearAll}
+                mt={4}
             >
                 Clear All
             </Button>

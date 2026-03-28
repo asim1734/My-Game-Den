@@ -14,8 +14,8 @@ import {
     SiGogdotcom,
     SiEpicgames,
     SiPlaystation,
-    SiNintendoswitch,
 } from "react-icons/si";
+import { BsNintendoSwitch } from "react-icons/bs";
 
 export const StoreLink = ({ website }) => {
     let StoreIcon = FaLink;
@@ -54,7 +54,7 @@ export const StoreLink = ({ website }) => {
             bgColor = "#107c10";
             break;
         case 24: // Nintendo
-            StoreIcon = SiNintendoswitch;
+            StoreIcon = BsNintendoSwitch;
             storeName = "Nintendo";
             bgColor = "#e60012";
             break;

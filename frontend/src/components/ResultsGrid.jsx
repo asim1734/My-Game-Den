@@ -6,24 +6,34 @@ import {
     Heading,
     SimpleGrid,
     Center,
-    Spinner, // Spinner is no longer used for loading, but might be for other features
     Text,
     Flex,
-    Select,
     Spacer,
+    Button,
+    HStack,
+    Tag,
+    TagCloseButton,
+    TagLabel,
+    VStack,
+    Icon,
 } from "@chakra-ui/react";
+import { FaArrowUp, FaArrowDown, FaSearch } from "react-icons/fa";
 import GameCard from "../components/GameCard";
-// 1. IMPORT THE SKELETON
 import GameCardSkeleton from "../components/GameCardSkeleton";
 
-const sortOptions = {
-    Popularity: "total_rating_count",
-    Rating: "total_rating",
-    "Release Date": "first_release_date",
-    Name: "name",
-};
+const SORT_OPTIONS = [
+    { label: "Popularity", value: "total_rating_count" },
+    { label: "Rating", value: "total_rating" },
+    { label: "Release Date", value: "first_release_date" },
+    { label: "Name", value: "name" },
+];
 
-export const ResultsGrid = ({ filters, onSortChange }) => {
+export const ResultsGrid = ({
+    filters,
+    onSortChange,
+    onClearOneFilter,
+    onClearAllFilters,
+}) => {
     const {
         data: games,
         isLoading,
@@ -34,42 +44,114 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
         queryFn: () => browseGames(filters),
     });
 
-    // 2. DEFINE A SKELETONS ARRAY
-    const skeletons = Array(12).fill(0); // 12 is a good default for a grid
+    const skeletons = Array(12).fill(0);
+
+    // Build active filter chips — one per category
+    const chips = [];
+    if (filters.genre.length > 0)
+        chips.push({ label: filters.genre.join(", "), key: "genre" });
+    if (filters.platform.length > 0)
+        chips.push({ label: filters.platform.join(", "), key: "platform" });
+    if (filters.minRating)
+        chips.push({
+            label: `Rating ≥ ${filters.minRating}`,
+            key: "minRating",
+        });
+    if (filters.releaseYearStart || filters.releaseYearEnd) {
+        const from = filters.releaseYearStart || "...";
+        const to = filters.releaseYearEnd || "...";
+        chips.push({ label: `${from}–${to}`, key: "year" });
+    }
+
+    const handleSortClick = (value) => {
+        if (filters.sortBy === value) {
+            // Clicking the active sort toggles direction
+            onSortChange(
+                "sortOrder",
+                filters.sortOrder === "desc" ? "asc" : "desc",
+            );
+        } else {
+            onSortChange("sortBy", value);
+        }
+    };
 
     return (
         <Box>
+            {/* Sort toggle buttons */}
             <Flex
                 direction={{ base: "column", md: "row" }}
-                gap={4}
-                mb={6}
-                align="center"
+                gap={3}
+                mb={4}
+                align={{ base: "stretch", md: "center" }}
+                flexWrap="wrap"
             >
-                {/* ... (Your Flex header with Heading and Selects is unchanged) ... */}
                 <Heading size="lg">Browse</Heading>
                 <Spacer />
-                <Select
-                    w={{ base: "100%", md: "200px" }}
-                    value={filters.sortBy}
-                    onChange={(e) => onSortChange("sortBy", e.target.value)}
-                >
-                    {Object.entries(sortOptions).map(([name, value]) => (
-                        <option key={value} value={value}>
-                            Sort by {name}
-                        </option>
-                    ))}
-                </Select>
-                <Select
-                    w={{ base: "100%", md: "150px" }}
-                    value={filters.sortOrder}
-                    onChange={(e) => onSortChange("sortOrder", e.target.value)}
-                >
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
-                </Select>
+                <HStack spacing={1} flexWrap="wrap">
+                    {SORT_OPTIONS.map(({ label, value }) => {
+                        const isActive = filters.sortBy === value;
+                        return (
+                            <Button
+                                key={value}
+                                size="sm"
+                                variant={isActive ? "solid" : "ghost"}
+                                colorScheme={isActive ? "purple" : "gray"}
+                                borderRadius="full"
+                                rightIcon={
+                                    isActive ? (
+                                        filters.sortOrder === "desc" ? (
+                                            <FaArrowDown size="10px" />
+                                        ) : (
+                                            <FaArrowUp size="10px" />
+                                        )
+                                    ) : undefined
+                                }
+                                onClick={() => handleSortClick(value)}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    })}
+                </HStack>
             </Flex>
 
-            {/* 3. REPLACED THE SPINNER WITH THE SKELETON GRID */}
+            {/* Active filter chips */}
+            {chips.length > 0 && (
+                <Flex gap={2} flexWrap="wrap" mb={3} align="center">
+                    {chips.map((chip) => (
+                        <Tag
+                            key={chip.key}
+                            size="sm"
+                            colorScheme="purple"
+                            variant="subtle"
+                            borderRadius="full"
+                        >
+                            <TagLabel>{chip.label}</TagLabel>
+                            <TagCloseButton
+                                onClick={() => onClearOneFilter(chip.key)}
+                            />
+                        </Tag>
+                    ))}
+                    <Button
+                        size="xs"
+                        variant="ghost"
+                        color="gray.500"
+                        _hover={{ color: "white" }}
+                        onClick={onClearAllFilters}
+                    >
+                        Clear all
+                    </Button>
+                </Flex>
+            )}
+
+            {/* Result count */}
+            {!isLoading && !isError && games && (
+                <Text fontSize="sm" color="gray.500" mb={4}>
+                    {games.length} game{games.length !== 1 ? "s" : ""} found
+                </Text>
+            )}
+
+            {/* Loading skeletons */}
             {isLoading && (
                 <SimpleGrid
                     columns={{ base: 1, sm: 2, md: 3, xl: 4 }}
@@ -99,17 +181,34 @@ export const ResultsGrid = ({ filters, onSortChange }) => {
                         ))}
                     </SimpleGrid>
                 ) : (
-                    // This is your empty state, which looks great!
                     <Center
                         minH="400px"
+                        flexDirection="column"
+                        gap={4}
                         borderWidth="1px"
                         borderColor="gray.700"
-                        borderRadius="md"
+                        borderStyle="dashed"
+                        borderRadius="xl"
                     >
-                        <Text>
-                            No games found. Try adjusting your filters and
-                            clicking "Apply".
-                        </Text>
+                        <Icon as={FaSearch} boxSize={10} color="gray.700" />
+                        <VStack spacing={1}>
+                            <Text fontWeight="semibold" color="gray.300">
+                                No games found
+                            </Text>
+                            <Text fontSize="sm" color="gray.500">
+                                Try adjusting or clearing your filters
+                            </Text>
+                        </VStack>
+                        {chips.length > 0 && (
+                            <Button
+                                size="sm"
+                                colorScheme="purple"
+                                variant="outline"
+                                onClick={onClearAllFilters}
+                            >
+                                Clear Filters
+                            </Button>
+                        )}
                     </Center>
                 ))}
         </Box>
