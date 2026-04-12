@@ -24,15 +24,162 @@ import {
     MenuList,
     MenuItem,
     Alert,
-    AlertIcon,
     AlertTitle,
     AlertDescription,
+    SimpleGrid,
 } from "@chakra-ui/react";
-import { FaChevronDown, FaStar, FaLock } from "react-icons/fa"; 
+import { FaChevronDown, FaLock } from "react-icons/fa";
 import { useGameActions } from "../hooks/useGameActions";
 import { StoreLink } from "../components/StoreLink";
 import { ReviewSection } from "../components/ReviewSection";
 import { CommunityReviews } from "../components/CommunityReviews";
+
+const formatDateLabel = (dateValue) => {
+    if (!dateValue) return "Unknown";
+    const parsed = new Date(dateValue);
+    if (Number.isNaN(parsed.getTime())) return "Unknown";
+    return parsed.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+};
+
+const formatScore = (value) =>
+    typeof value === "number" ? Math.round(value) : "N/A";
+
+const formatCount = (value) =>
+    typeof value === "number" ? value.toLocaleString() : "N/A";
+
+const formatReleaseYear = (dateValue) => {
+    if (!dateValue) return "TBA";
+    const parsed = new Date(dateValue);
+    if (Number.isNaN(parsed.getTime())) return "TBA";
+    return String(parsed.getFullYear());
+};
+
+const InfoTagSection = ({ title, items, emptyText = "No data available." }) => {
+    const validItems = Array.isArray(items)
+        ? [...new Set(items.filter(Boolean))]
+        : [];
+
+    return (
+        <Box>
+            <Heading size="md" mb={2}>
+                {title}
+            </Heading>
+            {validItems.length > 0 ? (
+                <HStack wrap="wrap">
+                    {validItems.map((item) => (
+                        <Tag key={`${title}-${item}`}>{item}</Tag>
+                    ))}
+                </HStack>
+            ) : (
+                <Text fontSize="sm" color="gray.500">
+                    {emptyText}
+                </Text>
+            )}
+        </Box>
+    );
+};
+
+const SidebarGameList = ({
+    title,
+    games,
+    emptyText = "No related games available.",
+}) => {
+    const hasItems = Array.isArray(games) && games.length > 0;
+
+    return (
+        <Box pt={2}>
+            <Heading size="sm" mb={3}>
+                {title}
+            </Heading>
+
+            {hasItems ? (
+                <VStack spacing={2} align="stretch">
+                    {games.map((relatedGame) => (
+                        <Box
+                            as={RouterLink}
+                            to={`/game/${relatedGame.igdbId}`}
+                            key={`${title}-${relatedGame.igdbId}`}
+                            border="1px solid"
+                            borderColor="whiteAlpha.200"
+                            bg="whiteAlpha.50"
+                            borderRadius="md"
+                            p={2}
+                            _hover={{
+                                bg: "whiteAlpha.100",
+                                borderColor: "teal.400",
+                            }}
+                        >
+                            <HStack align="flex-start" spacing={3}>
+                                <Image
+                                    src={
+                                        relatedGame.coverUrl ||
+                                        "https://via.placeholder.com/60x80?text=No+Cover"
+                                    }
+                                    alt={relatedGame.title}
+                                    w="54px"
+                                    h="72px"
+                                    objectFit="cover"
+                                    borderRadius="sm"
+                                    flexShrink={0}
+                                />
+
+                                <VStack align="start" spacing={1} minW={0}>
+                                    <Text
+                                        fontSize="sm"
+                                        color="white"
+                                        fontWeight="semibold"
+                                        noOfLines={2}
+                                    >
+                                        {relatedGame.title}
+                                    </Text>
+
+                                    <HStack spacing={2} wrap="wrap">
+                                        {relatedGame.relation && (
+                                            <Tag
+                                                size="sm"
+                                                bg="whiteAlpha.300"
+                                                color="white"
+                                            >
+                                                {relatedGame.relation}
+                                            </Tag>
+                                        )}
+
+                                        <Text fontSize="xs" color="gray.400">
+                                            {formatReleaseYear(
+                                                relatedGame.releaseDate,
+                                            )}
+                                        </Text>
+
+                                        {typeof relatedGame.rating ===
+                                            "number" && (
+                                            <Text
+                                                fontSize="xs"
+                                                color="yellow.300"
+                                            >
+                                                {Math.round(
+                                                    relatedGame.rating,
+                                                )}
+                                                /100
+                                            </Text>
+                                        )}
+                                    </HStack>
+                                </VStack>
+                            </HStack>
+                        </Box>
+                    ))}
+                </VStack>
+            ) : (
+                <Text fontSize="sm" color="gray.500">
+                    {emptyText}
+                </Text>
+            )}
+        </Box>
+    );
+};
 
 export const GameDetailsPage = () => {
     const { id: gameId } = useParams();
@@ -76,8 +223,18 @@ export const GameDetailsPage = () => {
             </Center>
         );
 
-    const releaseYear = game.releaseDate ? new Date(game.releaseDate).getFullYear() : "N/A";
-    const heroScreenshot = game.screenshots?.length > 0 ? game.screenshots[0] : game.coverUrl;
+    const releaseYear = game.releaseDate
+        ? new Date(game.releaseDate).getFullYear()
+        : "N/A";
+    const releaseDateLabel = formatDateLabel(game.releaseDate);
+    const heroScreenshot =
+        game.screenshots?.length > 0
+            ? game.screenshots[0]
+            : game.coverUrl || "https://via.placeholder.com/1600x900?text=No+Image";
+    const seriesItems = [game.collection, ...(game.franchises || [])].filter(
+        Boolean,
+    );
+    const keywordPreview = (game.keywords || []).slice(0, 16);
 
     return (
         <Box bg="brand.900" minH="100vh" overflowX="hidden">
@@ -97,17 +254,36 @@ export const GameDetailsPage = () => {
                     p={{ base: 4, md: 8 }}
                     bgGradient="linear(to-t, brand.900 10%, transparent 70%)"
                 >
-                    <Heading
-                        as="h1"
-                        size={{ base: "xl", md: "3xl" }}
-                        color="white"
-                        textShadow="2px 2px 8px black"
-                    >
-                        {game.title}
-                        <Text as="span" color="gray.400" ml={4} fontWeight="normal" fontSize={{ base: "lg", md: "2xl" }}>
-                            ({releaseYear})
-                        </Text>
-                    </Heading>
+                    <VStack align="flex-start" spacing={3}>
+                        <Heading
+                            as="h1"
+                            size={{ base: "xl", md: "3xl" }}
+                            color="white"
+                            textShadow="2px 2px 8px black"
+                        >
+                            {game.title}
+                            <Text
+                                as="span"
+                                color="gray.400"
+                                ml={4}
+                                fontWeight="normal"
+                                fontSize={{ base: "lg", md: "2xl" }}
+                            >
+                                ({releaseYear})
+                            </Text>
+                        </Heading>
+
+                        <HStack spacing={2} wrap="wrap">
+                            {game.status && (
+                                <Tag bg="teal.600" color="white">
+                                    {game.status}
+                                </Tag>
+                            )}
+                            <Tag bg="whiteAlpha.300" color="white">
+                                IGDB #{game.igdbId || gameId}
+                            </Tag>
+                        </HStack>
+                    </VStack>
                 </Flex>
             </Box>
 
@@ -187,21 +363,15 @@ export const GameDetailsPage = () => {
                                 </AlertDescription>
                             </Alert>
                         )}
-                    </VStack>
-                    <Box pt={4}>
-                            {" "}
-                            {/* Added some padding top */}
+
+                        <Box pt={2}>
                             <Heading size="sm" mb={2}>
                                 Related Links
-                            </Heading>{" "}
-                            {/* Changed Heading */}
+                            </Heading>
                             <Flex gap={2} wrap="wrap">
                                 {game.websites?.length > 0 ? (
                                     game.websites.map((site) => (
-                                        <StoreLink
-                                            key={site.id}
-                                            website={site}
-                                        />
+                                        <StoreLink key={site.id} website={site} />
                                     ))
                                 ) : (
                                     <Text fontSize="sm" color="gray.500">
@@ -211,23 +381,95 @@ export const GameDetailsPage = () => {
                             </Flex>
                         </Box>
 
+                        <SidebarGameList
+                            title="Similar Games"
+                            games={game.similarGames}
+                            emptyText="No similar games returned by IGDB."
+                        />
+
+                        <SidebarGameList
+                            title="DLCs & Expansions"
+                            games={game.dlcAndExpansions}
+                            emptyText="No DLC or expansion entries found."
+                        />
+                    </VStack>
                 </GridItem>
 
                 {/* Right Column (Main Details) */}
-                <GridItem w="100%" minW={0}> {/* minW={0} is critical for preventing Grid overflow */}
+                <GridItem w="100%" minW={0}>
                     <VStack spacing={10} align="stretch" color="white" w="100%">
-                        {/* Rating */}
-                        {game.rating && (
-                            <HStack fontSize="3xl">
-                                <Icon as={FaStar} color="yellow.400" />
-                                <Text fontWeight="extrabold">
-                                    {Math.round(game.rating)}
-                                    <Text as="span" fontSize="lg" color="gray.400" ml={1}>/ 100</Text>
-                                </Text>
-                            </HStack>
-                        )}
-                        
-                        {/* Summary */}
+                        <Box>
+                            <Heading size="lg" mb={4} borderLeft="4px solid" borderColor="teal.500" pl={4}>
+                                Quick Stats
+                            </Heading>
+
+                            <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4}>
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        User Score
+                                    </Text>
+                                    <Text fontSize="2xl" fontWeight="bold">
+                                        {formatScore(game.rating)}
+                                        <Text as="span" fontSize="md" color="gray.400" ml={1}>
+                                            /100
+                                        </Text>
+                                    </Text>
+                                </Box>
+
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        Critic Score
+                                    </Text>
+                                    <Text fontSize="2xl" fontWeight="bold">
+                                        {formatScore(game.aggregatedRating)}
+                                        <Text as="span" fontSize="md" color="gray.400" ml={1}>
+                                            /100
+                                        </Text>
+                                    </Text>
+                                </Box>
+
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        Ratings
+                                    </Text>
+                                    <Text fontSize="2xl" fontWeight="bold">
+                                        {formatCount(game.totalRatingCount)}
+                                    </Text>
+                                </Box>
+
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        Critic Reviews
+                                    </Text>
+                                    <Text fontSize="2xl" fontWeight="bold">
+                                        {formatCount(game.aggregatedRatingCount)}
+                                    </Text>
+                                </Box>
+
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        Follows / Hype
+                                    </Text>
+                                    <Text fontSize="2xl" fontWeight="bold">
+                                        {formatCount(game.follows)}
+                                        <Text as="span" fontSize="md" color="gray.400" mx={1}>
+                                            /
+                                        </Text>
+                                        {formatCount(game.hypes)}
+                                    </Text>
+                                </Box>
+
+                                <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
+                                    <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
+                                        Release Date
+                                    </Text>
+                                    <Text fontSize="xl" fontWeight="bold">
+                                        {releaseDateLabel}
+                                    </Text>
+                                </Box>
+                            </SimpleGrid>
+                        </Box>
+
                         <Box>
                             <Heading size="lg" mb={4} borderLeft="4px solid" borderColor="teal.500" pl={4}>
                                 Summary
@@ -235,14 +477,25 @@ export const GameDetailsPage = () => {
                             <Text lineHeight="tall" fontSize="lg" color="gray.300">
                                 {game.summary || "No summary available for this title."}
                             </Text>
+                            {game.storyline && (
+                                <Box mt={6}>
+                                    <Heading size="md" mb={3}>
+                                        Storyline
+                                    </Heading>
+                                    <Text lineHeight="tall" color="gray.300">
+                                        {game.storyline}
+                                    </Text>
+                                </Box>
+                            )}
                         </Box>
 
                         <Divider borderColor="whiteAlpha.200" />
 
-                        {/* Corrected Trailer Section */}
                         {game.videos?.length > 0 && (
                             <Box w="100%">
-                                <Heading size="lg" mb={4}>Official Trailer</Heading>
+                                <Heading size="lg" mb={4}>
+                                    Official Trailer
+                                </Heading>
                                 <Box maxW="800px" w="100%">
                                     <AspectRatio ratio={16 / 9} borderRadius="xl" overflow="hidden" boxShadow="dark-lg" bg="black">
                                         <iframe
@@ -255,15 +508,26 @@ export const GameDetailsPage = () => {
                             </Box>
                         )}
 
-                        {/* Gallery */}
                         {game.screenshots?.length > 1 && (
                             <Box w="100%">
-                                <Heading size="lg" mb={4}>Gallery</Heading>
-                                <HStack overflowX="auto" spacing={4} pb={4} sx={{
-                                    "&::-webkit-scrollbar": { height: "8px" },
-                                    "&::-webkit-scrollbar-track": { bg: "brand.900" },
-                                    "&::-webkit-scrollbar-thumb": { bg: "brand.700", borderRadius: "24px" },
-                                }}>
+                                <Heading size="lg" mb={4}>
+                                    Gallery
+                                </Heading>
+                                <HStack
+                                    overflowX="auto"
+                                    spacing={4}
+                                    pb={4}
+                                    sx={{
+                                        "&::-webkit-scrollbar": { height: "8px" },
+                                        "&::-webkit-scrollbar-track": {
+                                            bg: "brand.900",
+                                        },
+                                        "&::-webkit-scrollbar-thumb": {
+                                            bg: "brand.700",
+                                            borderRadius: "24px",
+                                        },
+                                    }}
+                                >
                                     {game.screenshots.slice(1).map((ss, index) => (
                                         <Image
                                             key={index}
@@ -279,30 +543,29 @@ export const GameDetailsPage = () => {
                             </Box>
                         )}
 
-                        {/* Info Grid */}
-                       <HStack spacing={8} wrap="wrap">
-                            <Box>
-                                <Heading size="md" mb={2}>
-                                    Genres
-                                </Heading>
-                                <HStack wrap="wrap">
-                                    {game.genres?.map((g) => (
-                                        <Tag key={g}>{g}</Tag>
-                                    ))}
-                                </HStack>
-                            </Box>
-                            <Box>
-                                <Heading size="md" mb={2}>
-                                    Platforms
-                                </Heading>
-                                <HStack wrap="wrap">
-                                    {game.platforms?.map((p) => (
-                                        <Tag key={p}>{p}</Tag>
-                                    ))}
-                                </HStack>
-                            </Box>
-                        </HStack>
+                        <Box>
+                            <Heading size="lg" mb={4} borderLeft="4px solid" borderColor="teal.500" pl={4}>
+                                Game Metadata
+                            </Heading>
 
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
+                                <InfoTagSection title="Genres" items={game.genres} />
+                                <InfoTagSection title="Platforms" items={game.platforms} />
+                                <InfoTagSection title="Developers" items={game.developers} />
+                                <InfoTagSection title="Publishers" items={game.publishers} />
+                                <InfoTagSection title="Game Modes" items={game.gameModes} />
+                                <InfoTagSection title="Perspectives" items={game.perspectives} />
+                                <InfoTagSection title="Themes" items={game.themes} />
+                                <InfoTagSection title="Engines" items={game.engines} />
+                                <InfoTagSection title="Series" items={seriesItems} />
+                                <InfoTagSection title="Age Ratings" items={game.ageRatings} />
+                                <InfoTagSection
+                                    title="Keywords"
+                                    items={keywordPreview}
+                                    emptyText="No keyword metadata from IGDB."
+                                />
+                            </SimpleGrid>
+                        </Box>
                     </VStack>
                 </GridItem>
             </Grid>

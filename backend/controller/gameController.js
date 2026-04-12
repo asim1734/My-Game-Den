@@ -4,6 +4,97 @@ const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID;
 const IGDB_BEARER_TOKEN = process.env.IGDB_BEARER_TOKEN;
 const IGDB_API_URL = "https://api.igdb.com/v4";
 
+const GAME_STATUS_MAP = {
+    0: "Released",
+    2: "Alpha",
+    3: "Beta",
+    4: "Early Access",
+    5: "Offline",
+    6: "Cancelled",
+    7: "Rumored",
+    8: "Delisted",
+};
+
+const AGE_RATING_CATEGORY_MAP = {
+    1: "ESRB",
+    2: "PEGI",
+    3: "CERO",
+    4: "USK",
+    5: "GRAC",
+    6: "ClassInd",
+    7: "ACB",
+};
+
+const ESRB_RATING_MAP = {
+    6: "RP",
+    7: "EC",
+    8: "E",
+    9: "E10+",
+    10: "T",
+    11: "M",
+    12: "AO",
+};
+
+const PEGI_RATING_MAP = {
+    1: "3",
+    2: "7",
+    3: "12",
+    4: "16",
+    5: "18",
+};
+
+const uniqueStrings = (values = []) => [...new Set(values.filter(Boolean))];
+
+const uniqueByIgdbId = (items = []) => {
+    const seen = new Set();
+
+    return items.filter((item) => {
+        if (!item || !item.igdbId || seen.has(item.igdbId)) return false;
+        seen.add(item.igdbId);
+        return true;
+    });
+};
+
+const mapRelatedGame = (rawGame, relation = null) => {
+    if (!rawGame || !rawGame.id || !rawGame.name) return null;
+
+    const coverUrl = rawGame.cover?.url
+        ? `https:${rawGame.cover.url.replace(
+              /\/t_[a-zA-Z0-9_]+\//,
+              "/t_cover_small/"
+          )}`
+        : null;
+
+    return {
+        igdbId: rawGame.id,
+        title: rawGame.name,
+        coverUrl,
+        relation,
+        releaseDate: rawGame.first_release_date
+            ? new Date(rawGame.first_release_date * 1000).toISOString()
+            : null,
+        rating: rawGame.total_rating ?? null,
+    };
+};
+
+const mapAgeRatingLabel = (ageRating) => {
+    if (!ageRating) return null;
+
+    const category = AGE_RATING_CATEGORY_MAP[ageRating.category] || "Rating";
+
+    if (ageRating.category === 1) {
+        const esrb = ESRB_RATING_MAP[ageRating.rating];
+        return esrb ? `${category}: ${esrb}` : null;
+    }
+
+    if (ageRating.category === 2) {
+        const pegi = PEGI_RATING_MAP[ageRating.rating];
+        return pegi ? `${category}: ${pegi}` : null;
+    }
+
+    return ageRating.rating ? `${category}: ${ageRating.rating}` : null;
+};
+
 // --- Reusable Helper Functions ---
 
 const mapGameData = (rawGame) => {
@@ -144,7 +235,59 @@ exports.getGamesByIds = async (req, res) => {
 exports.getGameById = async (req, res) => {
     try {
         const { id } = req.params;
-        const queryString = `fields name, cover.url, genres.name, platforms.name, first_release_date, total_rating, summary, videos.video_id, screenshots.url, websites.*, involved_companies.company.name, player_perspectives.name, game_modes.name; where id = ${id};`;
+        const queryString = `
+            fields
+                name,
+                summary,
+                storyline,
+                status,
+                cover.url,
+                screenshots.url,
+                videos.video_id,
+                websites.*,
+                first_release_date,
+                genres.name,
+                themes.name,
+                keywords.name,
+                platforms.name,
+                game_modes.name,
+                player_perspectives.name,
+                game_engines.name,
+                collection.name,
+                franchises.name,
+                similar_games.id,
+                similar_games.name,
+                similar_games.cover.url,
+                similar_games.first_release_date,
+                similar_games.total_rating,
+                dlcs.id,
+                dlcs.name,
+                dlcs.cover.url,
+                dlcs.first_release_date,
+                dlcs.total_rating,
+                expansions.id,
+                expansions.name,
+                expansions.cover.url,
+                expansions.first_release_date,
+                expansions.total_rating,
+                standalone_expansions.id,
+                standalone_expansions.name,
+                standalone_expansions.cover.url,
+                standalone_expansions.first_release_date,
+                standalone_expansions.total_rating,
+                involved_companies.developer,
+                involved_companies.publisher,
+                involved_companies.company.name,
+                age_ratings.category,
+                age_ratings.rating,
+                total_rating,
+                total_rating_count,
+                aggregated_rating,
+                aggregated_rating_count,
+                hypes,
+                follows;
+            where id = ${id};
+        `;
 
         const rawGames = await fetchFromIGDB(
             "games",
@@ -158,9 +301,48 @@ exports.getGameById = async (req, res) => {
 
         // Expanded mapping for the new data
         const game = rawGames[0];
+        const developers = uniqueStrings(
+            game.involved_companies
+                ?.filter((c) => c.developer && c.company?.name)
+                .map((c) => c.company.name) || []
+        );
+        const publishers = uniqueStrings(
+            game.involved_companies
+                ?.filter((c) => c.publisher && c.company?.name)
+                .map((c) => c.company.name) || []
+        );
+        const ageRatings = uniqueStrings(
+            (game.age_ratings || []).map(mapAgeRatingLabel)
+        );
+        const similarGames = uniqueByIgdbId(
+            (game.similar_games || []).map((relatedGame) =>
+                mapRelatedGame(relatedGame)
+            )
+        ).slice(0, 8);
+        const dlcAndExpansions = uniqueByIgdbId(
+            [
+                ...(game.dlcs || []).map((relatedGame) =>
+                    mapRelatedGame(relatedGame, "DLC")
+                ),
+                ...(game.expansions || []).map((relatedGame) =>
+                    mapRelatedGame(relatedGame, "Expansion")
+                ),
+                ...(game.standalone_expansions || []).map((relatedGame) =>
+                    mapRelatedGame(relatedGame, "Standalone Expansion")
+                ),
+            ]
+        ).slice(0, 8);
+
         const detailedGame = {
             ...mapGameData(game), // Uses your existing simple mapper
             summary: game.summary,
+            storyline: game.storyline || null,
+            status: GAME_STATUS_MAP[game.status] || null,
+            totalRatingCount: game.total_rating_count ?? null,
+            aggregatedRating: game.aggregated_rating ?? null,
+            aggregatedRatingCount: game.aggregated_rating_count ?? null,
+            follows: game.follows ?? null,
+            hypes: game.hypes ?? null,
             screenshots: game.screenshots
                 ? game.screenshots.map(
                       (ss) =>
@@ -172,12 +354,18 @@ exports.getGameById = async (req, res) => {
                 : [],
             videos: game.videos ? game.videos.map((v) => v.video_id) : [],
             websites: game.websites || [],
-            developers:
-                game.involved_companies
-                    ?.filter((c) => c.developer)
-                    .map((c) => c.company.name) || [],
+            developers,
+            publishers,
             perspectives: game.player_perspectives?.map((p) => p.name) || [],
             gameModes: game.game_modes?.map((m) => m.name) || [],
+            themes: game.themes?.map((t) => t.name) || [],
+            keywords: game.keywords?.map((k) => k.name) || [],
+            engines: game.game_engines?.map((engine) => engine.name) || [],
+            collection: game.collection?.name || null,
+            franchises: game.franchises?.map((franchise) => franchise.name) || [],
+            ageRatings,
+            similarGames,
+            dlcAndExpansions,
         };
 
         res.status(200).json(detailedGame);
