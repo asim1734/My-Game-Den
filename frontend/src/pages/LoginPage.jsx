@@ -70,10 +70,8 @@ export function LoginPage() {
                 username,
                 password,
             });
-            console.log("User logged in");
             return { success: true, data: res.data };
         } catch (e) {
-            console.log(e);
             return { success: false, error: e };
         }
     };

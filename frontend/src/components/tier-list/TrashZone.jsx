@@ -13,8 +13,8 @@ export const TrashZone = () => {
         <Box
             ref={setNodeRef}
             // Match dimensions to your Game Cards (80px x 110px) for consistency
-            w="80px"
-            h="110px"
+            w={{ base: "58px", md: "80px" }}
+            h={{ base: "78px", md: "110px" }}
             // Default: Dark Gray. Hover: Bright Red.
             bg={isOver ? "red.500" : "whiteAlpha.100"}
             // Border: Subtle dashed when idle, solid red when active
@@ -32,16 +32,17 @@ export const TrashZone = () => {
             <VStack spacing={1}>
                 <Icon 
                     as={FaTrash} 
-                    boxSize={5} 
+                    boxSize={{ base: 4, md: 5 }} 
                     color={isOver ? "white" : "gray.500"} 
                     transform={isOver ? "scale(1.2)" : "scale(1)"}
                     transition="transform 0.2s"
                 />
                 <Text 
-                    fontSize="10px" 
+                    fontSize={{ base: "9px", md: "10px" }} 
                     fontWeight="bold" 
                     textTransform="uppercase"
                     color={isOver ? "white" : "gray.500"}
+                    display={{ base: "none", md: "block" }}
                 >
                     Remove
                 </Text>

@@ -5,8 +5,12 @@ import { FaTimes } from "react-icons/fa";
 export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => {
     const isSidebar = variant === "sidebar";
     
-    const width = isSidebar ? "70px" : "60px";
-    const height = isSidebar ? "93px" : "80px"; 
+    const width = isSidebar
+        ? { base: "58px", sm: "64px", md: "70px" }
+        : { base: "50px", sm: "54px", md: "60px" };
+    const height = isSidebar
+        ? { base: "78px", sm: "86px", md: "93px" }
+        : { base: "66px", sm: "72px", md: "80px" };
 
     // --- DATA NORMALIZATION ---
     const gameTitle = game.title || game.name || "Unknown Game";
@@ -32,7 +36,7 @@ export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => 
                 overflow="hidden"
                 cursor={onClick ? "pointer" : "grab"}
                 boxShadow="dark-lg" // Deeper shadow for pop
-                border="2px solid transparent"
+                border="1px solid transparent"
                 transition="all 0.2s"
                 bg="gray.800"
                 _hover={{ borderColor: "purple.400", transform: "scale(1.05)", zIndex: 10 }}
@@ -64,9 +68,9 @@ export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => 
                             onRemove(gameId);
                         }}
                         aria-label="Remove game"
-                        minW="14px"
-                        h="14px"
-                        fontSize="9px"
+                        minW={{ base: "16px", md: "14px" }}
+                        h={{ base: "16px", md: "14px" }}
+                        fontSize={{ base: "10px", md: "9px" }}
                         roundedTopLeft="none"
                         roundedBottomRight="none"
                         zIndex={3}

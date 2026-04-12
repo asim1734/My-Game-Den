@@ -10,6 +10,15 @@ import {
     Spinner,
     VStack,
     Text,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
+    Wrap,
+    WrapItem,
+    useBreakpointValue,
 } from "@chakra-ui/react";
 import {
     FaPlus,
@@ -37,6 +46,7 @@ import { useTierList } from "../hooks/useTierList";
 export const TierListEditorPage = () => {
     const { id } = useParams();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const isDesktopSidebar = useBreakpointValue({ base: false, lg: true }) || false;
 
     const {
         items,
@@ -116,9 +126,9 @@ export const TierListEditorPage = () => {
                 h="calc(100vh - 64px)"
                 overflow="hidden"
                 bg="brand.900"
-                mx={{ base: -2, md: -4 }}
-                mt={{ base: -2, md: -4 }}
-                mb={{ base: -2, md: -4 }}
+                mx={{ base: 0, md: -4 }}
+                mt={{ base: 0, md: -4 }}
+                mb={{ base: 0, md: -4 }}
                 w="auto"
             >
                 {/* LEFT: Editor Area */}
@@ -129,12 +139,15 @@ export const TierListEditorPage = () => {
                     position="relative"
                 >
                     {/* 1. Header Bar */}
-                    <HStack
-                        px={4}
+                    <Flex
+                        px={{ base: 3, md: 4 }}
                         py={2}
                         bg="brand.800"
                         borderBottom="1px solid"
                         borderColor="brand.700"
+                        direction={{ base: "column", md: "row" }}
+                        align={{ base: "stretch", md: "center" }}
+                        gap={{ base: 2, md: 0 }}
                         justify="space-between"
                         flexShrink={0}
                         zIndex={20}
@@ -162,73 +175,83 @@ export const TierListEditorPage = () => {
                             )}
                         </HStack>
 
-                        <HStack spacing={1}>
-                            <Tooltip label="Undo (Ctrl+Z)" openDelay={500}>
+                        <Wrap spacing={1} justify={{ base: "flex-start", md: "flex-end" }}>
+                            <WrapItem>
+                                <Tooltip label="Undo (Ctrl+Z)" openDelay={500}>
+                                    <Button
+                                        size="xs"
+                                        variant="ghost"
+                                        colorScheme="gray"
+                                        onClick={undo}
+                                        isDisabled={!canUndo}
+                                        px={2}
+                                    >
+                                        <FaUndo />
+                                    </Button>
+                                </Tooltip>
+                            </WrapItem>
+
+                            <WrapItem>
+                                <Tooltip label="Redo (Ctrl+Y)" openDelay={500}>
+                                    <Button
+                                        size="xs"
+                                        variant="ghost"
+                                        colorScheme="gray"
+                                        onClick={redo}
+                                        isDisabled={!canRedo}
+                                        px={2}
+                                    >
+                                        <FaRedo />
+                                    </Button>
+                                </Tooltip>
+                            </WrapItem>
+
+                            <WrapItem>
                                 <Button
+                                    leftIcon={
+                                        isSidebarOpen ? <FaTimes /> : <FaPlus />
+                                    }
+                                    colorScheme={isSidebarOpen ? "gray" : "purple"}
+                                    variant={isSidebarOpen ? "ghost" : "solid"}
                                     size="xs"
-                                    variant="ghost"
-                                    colorScheme="gray"
-                                    onClick={undo}
-                                    isDisabled={!canUndo}
-                                    px={2}
+                                    onClick={() => setSidebarOpen(!isSidebarOpen)}
                                 >
-                                    <FaUndo />
+                                    {isSidebarOpen ? "Close" : "Games"}
                                 </Button>
-                            </Tooltip>
+                            </WrapItem>
 
-                            <Tooltip label="Redo (Ctrl+Y)" openDelay={500}>
+                            <WrapItem>
                                 <Button
+                                    leftIcon={<FaSave />}
                                     size="xs"
-                                    variant="ghost"
-                                    colorScheme="gray"
-                                    onClick={redo}
-                                    isDisabled={!canRedo}
-                                    px={2}
+                                    colorScheme={isDirty ? "green" : "gray"}
+                                    variant="solid"
+                                    onClick={handleSave}
                                 >
-                                    <FaRedo />
+                                    Save
                                 </Button>
-                            </Tooltip>
+                            </WrapItem>
 
-                            <Button
-                                leftIcon={
-                                    isSidebarOpen ? <FaTimes /> : <FaPlus />
-                                }
-                                colorScheme={isSidebarOpen ? "gray" : "purple"}
-                                variant={isSidebarOpen ? "ghost" : "solid"}
-                                size="xs"
-                                onClick={() => setSidebarOpen(!isSidebarOpen)}
-                            >
-                                {isSidebarOpen ? "Close" : "Add Games"}
-                            </Button>
-
-                            <Button
-                                leftIcon={<FaSave />}
-                                size="xs"
-                                colorScheme={isDirty ? "green" : "gray"}
-                                variant="solid"
-                                onClick={handleSave}
-                            >
-                                Save
-                            </Button>
-
-                            <Button
-                                leftIcon={<FaDownload />}
-                                size="xs"
-                                colorScheme="blue"
-                                variant="outline"
-                                onClick={() => downloadImage("tier-list-board")}
-                            >
-                                Export
-                            </Button>
-                        </HStack>
-                    </HStack>
+                            <WrapItem>
+                                <Button
+                                    leftIcon={<FaDownload />}
+                                    size="xs"
+                                    colorScheme="blue"
+                                    variant="outline"
+                                    onClick={() => downloadImage("tier-list-board")}
+                                >
+                                    Export
+                                </Button>
+                            </WrapItem>
+                        </Wrap>
+                    </Flex>
 
                     {/* 2. Scrollable Tiers */}
                     <Box
                         id="tier-list-board"
                         flex={1}
                         overflowY="auto"
-                        p={4}
+                        p={{ base: 2, md: 4 }}
                         bg="brand.900"
                         minH="0"
                         css={{
@@ -261,7 +284,7 @@ export const TierListEditorPage = () => {
                         <Button
                             data-export-hide="true"
                             leftIcon={<FaPlus />}
-                            size="sm"
+                            size={{ base: "xs", md: "sm" }}
                             w="full"
                             mt={2}
                             border="1px dashed"
@@ -298,8 +321,9 @@ export const TierListEditorPage = () => {
 
                 </Flex>
 
-                {/* 4. Right Sidebar */}
+                {/* 4. Desktop Right Sidebar */}
                 <Box
+                    display={{ base: "none", lg: "block" }}
                     w={isSidebarOpen ? "320px" : "0px"}
                     overflow="hidden"
                     transition="width 0.3s ease"
@@ -312,6 +336,25 @@ export const TierListEditorPage = () => {
                     </Box>
                 </Box>
             </Flex>
+
+            {/* 5. Mobile Sidebar Drawer */}
+            <Drawer
+                isOpen={!isDesktopSidebar && isSidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                placement="right"
+                size="full"
+            >
+                <DrawerOverlay />
+                <DrawerContent bg="brand.900">
+                    <DrawerCloseButton />
+                    <DrawerHeader borderBottom="1px solid" borderColor="brand.700">
+                        Add Games
+                    </DrawerHeader>
+                    <DrawerBody p={0}>
+                        <GamePickerSidebar onAddGame={handleAddGame} />
+                    </DrawerBody>
+                </DrawerContent>
+            </Drawer>
 
             <DragOverlay>
                 {activeDragItem ? (

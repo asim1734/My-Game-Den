@@ -63,13 +63,13 @@ export const CollectionsTab = () => {
     if (isError) return <Text color="red.400">Error loading collections.</Text>;
 
     return (
-        <Box pt={6}>
+        <Box pt={{ base: 2, md: 6 }}>
             {collections.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 4, md: 6 }}>
                     {collections.map((list, index) => (
                         <Box 
                             key={`${list.name}-${index}`} 
-                            p={5}
+                            p={{ base: 4, md: 5 }}
                             bg="brand.800"
                             borderRadius="xl"
                             border="1px solid"
@@ -87,8 +87,8 @@ export const CollectionsTab = () => {
                             <VStack align="start" spacing={3}>
                                 <HStack justify="space-between" w="full" align="flex-start">
                                     <HStack>
-                                        <Icon as={FaFolderOpen} color="brand.400" boxSize={5} />
-                                        <Badge colorScheme="purple" borderRadius="full" px={2}>
+                                        <Icon as={FaFolderOpen} color="brand.400" boxSize={{ base: 4, md: 5 }} />
+                                        <Badge colorScheme="purple" borderRadius="full" px={{ base: 1.5, md: 2 }}>
                                             {getGameCountLabel(list.games?.length)}
                                         </Badge>
                                     </HStack>
@@ -132,7 +132,7 @@ export const CollectionsTab = () => {
                                 </HStack>
 
                                 <Box>
-                                    <Heading size="md" color="white" noOfLines={1}>
+                                    <Heading size={{ base: "sm", md: "md" }} color="white" noOfLines={{ base: 2, md: 1 }}>
                                         {list.name}
                                     </Heading>
                                     <Text fontSize="xs" color="gray.500" mt={1}>
@@ -144,9 +144,16 @@ export const CollectionsTab = () => {
                     ))}
                 </SimpleGrid>
             ) : (
-                <Center py={20} flexDirection="column" border="2px dashed" borderColor="brand.700" borderRadius="2xl">
-                    <Icon as={FaFolderOpen} boxSize={10} color="gray.600" mb={4} />
-                    <Text color="gray.500">You don't have any collections yet.</Text>
+                <Center
+                    py={{ base: 12, md: 20 }}
+                    px={4}
+                    flexDirection="column"
+                    border="2px dashed"
+                    borderColor="brand.700"
+                    borderRadius="2xl"
+                >
+                    <Icon as={FaFolderOpen} boxSize={{ base: 8, md: 10 }} color="gray.600" mb={4} />
+                    <Text color="gray.500" textAlign="center">You don't have any collections yet.</Text>
                 </Center>
             )}
 

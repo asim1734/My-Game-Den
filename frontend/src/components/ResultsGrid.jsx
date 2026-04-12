@@ -154,8 +154,8 @@ export const ResultsGrid = ({
             {/* Loading skeletons */}
             {isLoading && (
                 <SimpleGrid
-                    columns={{ base: 1, sm: 2, md: 3, xl: 4 }}
-                    spacing={6}
+                    columns={{ base: 3, md: 4, xl: 5 }}
+                    spacing={{ base: 3, md: 6 }}
                 >
                     {skeletons.map((_, index) => (
                         <GameCardSkeleton key={index} />
@@ -173,8 +173,8 @@ export const ResultsGrid = ({
                 !isError &&
                 (games?.length > 0 ? (
                     <SimpleGrid
-                        columns={{ base: 1, sm: 2, md: 3, xl: 4 }}
-                        spacing={6}
+                        columns={{ base: 3, md: 4, xl: 5 }}
+                        spacing={{ base: 3, md: 6 }}
                     >
                         {games.map((game) => (
                             <GameCard key={game.igdbId} game={game} />

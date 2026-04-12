@@ -1,5 +1,5 @@
 import { 
-    Box, Heading, Flex, Select, SimpleGrid, Text, Container, Spinner, Center, Button, HStack 
+    Box, Heading, Flex, Select, SimpleGrid, Text, Container, Center, Button, HStack 
 } from "@chakra-ui/react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ export const SearchResultsPage = () => {
     const sortBy = searchParams.get("sortBy") || "total_rating_count";
     const sortOrder = searchParams.get("sortOrder") || "desc";
 
-    const { data: games, isLoading, isError } = useQuery({
+    const { data: games, isLoading, isError, error } = useQuery({
         queryKey: ["search", term, sortBy, sortOrder, page],
         queryFn: () => searchGames(term, { sortBy, sortOrder, page }),
         enabled: !!term,
@@ -38,13 +38,21 @@ export const SearchResultsPage = () => {
                     <Text color="gray.500">Page {page}</Text>
                 </Box>
                 
-                <Flex gap={3}>
-                    <Select value={sortBy} onChange={(e) => updateParams({ sortBy: e.target.value, page: "1" })} width="180px">
+                <Flex gap={3} direction={{ base: "column", sm: "row" }} w={{ base: "100%", md: "auto" }}>
+                    <Select
+                        value={sortBy}
+                        onChange={(e) => updateParams({ sortBy: e.target.value, page: "1" })}
+                        width={{ base: "100%", sm: "180px" }}
+                    >
                         <option value="total_rating_count">Popularity</option>
                         <option value="total_rating">Rating</option>
                         <option value="first_release_date">Release Date</option>
                     </Select>
-                    <Select value={sortOrder} onChange={(e) => updateParams({ sortOrder: e.target.value, page: "1" })} width="140px">
+                    <Select
+                        value={sortOrder}
+                        onChange={(e) => updateParams({ sortOrder: e.target.value, page: "1" })}
+                        width={{ base: "100%", sm: "140px" }}
+                    >
                         <option value="desc">Descending</option>
                         <option value="asc">Ascending</option>
                     </Select>
@@ -52,14 +60,20 @@ export const SearchResultsPage = () => {
             </Flex>
 
             {isLoading ? (
-                <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
-        {Array.from({ length: 8 }).map((_, i) => (
-            <GameCardSkeleton key={i} />
-        ))}
-    </SimpleGrid>
+                <SimpleGrid columns={{ base: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <GameCardSkeleton key={i} />
+                    ))}
+                </SimpleGrid>
+            ) : isError ? (
+                <Center py={20}>
+                    <Text color="red.400">
+                        Could not load results: {error?.message || "Unknown error"}
+                    </Text>
+                </Center>
             ) : games?.length > 0 ? (
                 <>
-                    <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
+                    <SimpleGrid columns={{ base: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
                         {games.map((game) => (
                             <GameCard key={game.igdbId} game={game} />
                         ))}

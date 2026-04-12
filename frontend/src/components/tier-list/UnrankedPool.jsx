@@ -17,11 +17,11 @@ export const UnrankedPool = ({ games, id = "unranked", onRemove }) => {
             bg="blackAlpha.400"
             borderRadius="md"
             overflow="hidden"
-            minH="100px"
+            minH={{ base: "82px", md: "100px" }}
         >
             {/* Left label — matches TierRow label column */}
             <Box
-                w="80px"
+                w={{ base: "62px", md: "80px" }}
                 bg="gray.700"
                 display="flex"
                 flexDirection="column"
@@ -46,13 +46,13 @@ export const UnrankedPool = ({ games, id = "unranked", onRemove }) => {
             </Box>
 
             {/* Games area — matches TierRow games column */}
-            <Box ref={setNodeRef} flex={1} p={2} minW="0">
+            <Box ref={setNodeRef} flex={1} p={{ base: 1.5, md: 2 }} minW="0">
                 <SortableContext
                     id={id}
                     items={games.map((g) => g.igdbId || g.id)}
                     strategy={rectSortingStrategy}
                 >
-                    <Flex wrap="wrap" gap={2} minH="80px" align="center">
+                    <Flex wrap="wrap" gap={{ base: 1.5, md: 2 }} minH={{ base: "62px", md: "80px" }} align="center">
                         {games.length === 0 ? (
                             <Text
                                 fontSize="xs"
@@ -82,7 +82,7 @@ export const UnrankedPool = ({ games, id = "unranked", onRemove }) => {
             <Flex
                 align="center"
                 justify="center"
-                px={3}
+                px={{ base: 2, md: 3 }}
                 flexShrink={0}
                 data-export-hide="true"
             >

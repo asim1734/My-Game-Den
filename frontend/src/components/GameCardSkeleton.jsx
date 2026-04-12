@@ -10,10 +10,27 @@ import {
     Spacer,
 } from "@chakra-ui/react";
 
-const GameCardSkeleton = () => {
+const GameCardSkeleton = ({ variant = "grid" }) => {
+    const isDashboardCard = variant === "dashboard";
+
     return (
         <Card
-            minWidth="180px" // Matches minWidth from GameCard
+            minW={
+                isDashboardCard
+                    ? { base: "146px", sm: "164px", md: "180px" }
+                    : 0
+            }
+            w={
+                isDashboardCard
+                    ? { base: "146px", sm: "164px", md: "180px" }
+                    : "100%"
+            }
+            h={
+                isDashboardCard
+                    ? { base: "360px", sm: "392px", md: "430px" }
+                    : "100%"
+            }
+            flexShrink={isDashboardCard ? 0 : 1}
             borderRadius="lg"
             overflow="hidden"
             as="div" // Use 'as' to avoid LinkBox/Card nesting warnings
@@ -22,7 +39,12 @@ const GameCardSkeleton = () => {
                 <Skeleton height="100%" />
             </AspectRatio>
 
-            <CardBody p={3} display="flex" flexDirection="column" flex="1">
+            <CardBody
+                p={isDashboardCard ? { base: 2.5, md: 3 } : 3}
+                display="flex"
+                flexDirection="column"
+                flex="1"
+            >
                 {/* Top Row: Badge and Year */}
                 <HStack justify="space-between" mb={2}>
                     <Skeleton height="20px" width="45px" borderRadius="md" />
@@ -47,7 +69,6 @@ const GameCardSkeleton = () => {
 
                 {/* Buttons */}
                 <HStack spacing="2" width="100%" mt={3}>
-                    <Skeleton height="32px" flex="1" />
                     <Skeleton height="32px" flex="1" />
                 </HStack>
             </CardBody>

@@ -57,13 +57,15 @@ export const GamePickerSidebar = ({ onAddGame }) => {
     };
 
     return (
-        <Box 
-            w="320px" h="full" bg="brand.900" 
-            borderLeft="1px solid" borderColor="brand.700"
-            display="flex" flexDirection="column"
+        <Box
+            w="full"
+            h="full"
+            bg="brand.900"
+            display="flex"
+            flexDirection="column"
         >
             {/* HEADER */}
-            <Box p={4} borderBottom="1px solid" borderColor="brand.700">
+            <Box p={{ base: 3, md: 4 }} borderBottom="1px solid" borderColor="brand.700">
                 <HStack mb={4} spacing={2} bg="blackAlpha.300" p={1} borderRadius="md">
                     <Button 
                         size="xs" flex={1} 
@@ -86,7 +88,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                 </HStack>
 
                 {activeTab === "search" && (
-                    <InputGroup size="sm">
+                    <InputGroup size={{ base: "xs", md: "sm" }}>
                         <InputLeftElement pointerEvents="none"><FaSearch color="gray.500" /></InputLeftElement>
                         <Input 
                             placeholder="Search IGDB..." 
@@ -104,7 +106,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                             icon={<FaArrowLeft />} size="xs" variant="ghost" 
                             onClick={() => setSelectedCollection(null)} aria-label="Back"
                         />
-                        <Text fontSize="sm" fontWeight="bold" noOfLines={1}>
+                        <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" noOfLines={1}>
                             {selectedCollection.name || selectedCollection.title}
                         </Text>
                     </HStack>
@@ -112,7 +114,12 @@ export const GamePickerSidebar = ({ onAddGame }) => {
             </Box>
 
             {/* CONTENT */}
-            <Box flex={1} overflowY="auto" p={4} css={{ '&::-webkit-scrollbar': { width: '4px' } }}>
+            <Box
+                flex={1}
+                overflowY="auto"
+                p={{ base: 2, md: 4 }}
+                css={{ '&::-webkit-scrollbar': { width: '4px' } }}
+            >
                 
                 {/* 1. SEARCH RESULTS */}
                 {activeTab === "search" && (
@@ -120,7 +127,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                         {isSearchLoading ? (
                             <Box textAlign="center" py={10}><Spinner color="purple.500" /></Box>
                         ) : searchResults && searchResults.length > 0 ? (
-                            <SimpleGrid columns={3} spacing={3}>
+                            <SimpleGrid columns={{ base: 3, sm: 4, md: 3 }} spacing={{ base: 2, md: 3 }}>
                                 {searchResults.map((game) => (
                                     <TierGameCard 
                                         key={game.igdbId || game.id} 
@@ -149,14 +156,14 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                                     <HStack 
                                         // Fallback Key if _id is missing
                                         key={list._id || index}
-                                        p={3} bg="whiteAlpha.50" borderRadius="md" cursor="pointer"
+                                        p={{ base: 2.5, md: 3 }} bg="whiteAlpha.50" borderRadius="md" cursor="pointer"
                                         _hover={{ bg: "whiteAlpha.100", transform: "translateX(2px)" }}
                                         transition="all 0.2s"
                                         onClick={() => setSelectedCollection(list)}
                                     >
                                         <Icon as={FaFolder} color="yellow.400" boxSize={4} />
                                         <VStack align="start" spacing={0} flex={1}>
-                                            <Text fontSize="sm" fontWeight="bold">{list.name || list.title || "Untitled"}</Text>
+                                            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold">{list.name || list.title || "Untitled"}</Text>
                                             <Text fontSize="xs" color="gray.500">{list.games?.length || 0} games</Text>
                                         </VStack>
                                         <Icon as={FaGamepad} color="gray.600" boxSize={3} />
@@ -177,7 +184,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                         {isCollectionLoading ? (
                              <Box textAlign="center" py={10}><Spinner color="purple.500" /></Box>
                         ) : collectionGames && collectionGames.length > 0 ? (
-                            <SimpleGrid columns={3} spacing={3}>
+                            <SimpleGrid columns={{ base: 3, sm: 4, md: 3 }} spacing={{ base: 2, md: 3 }}>
                                 {collectionGames.map((game) => (
                                     <TierGameCard 
                                         key={game.igdbId || game.id} 

@@ -82,9 +82,9 @@ export const TierListsTab = () => {
     }
 
     return (
-        <Box>
+        <Box pt={{ base: 2, md: 6 }}>
             {tierLists?.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 8 }}>
                     {tierLists.map((list, index) => {
                         const rankedCount =
                             list.tiers?.reduce(
@@ -139,15 +139,15 @@ export const TierListsTab = () => {
                                     )}
                                 </HStack>
 
-                                <VStack align="start" spacing={3} p={6} w="full">
+                                <VStack align="start" spacing={3} p={{ base: 4, md: 6 }} w="full">
                                     {/* Top row: badges + menu */}
-                                    <HStack justify="space-between" w="full">
-                                        <HStack spacing={2}>
+                                    <HStack justify="space-between" w="full" align="flex-start">
+                                        <HStack spacing={2} flexWrap="wrap">
                                             <Badge
                                                 colorScheme={categoryColor}
                                                 variant="subtle"
                                                 borderRadius="full"
-                                                px={2}
+                                                px={{ base: 1.5, md: 2 }}
                                             >
                                                 {category}
                                             </Badge>
@@ -155,7 +155,7 @@ export const TierListsTab = () => {
                                                 colorScheme={list.isPublic ? "green" : "gray"}
                                                 variant="subtle"
                                                 borderRadius="full"
-                                                px={2}
+                                                px={{ base: 1.5, md: 2 }}
                                             >
                                                 {list.isPublic ? "Public" : "Private"}
                                             </Badge>
@@ -207,17 +207,23 @@ export const TierListsTab = () => {
 
                                     {/* Title — own row, full width, no flex competition */}
                                     <Text
-                                        fontSize={titleFontSize}
+                                        fontSize={{ base: "sm", sm: titleFontSize }}
                                         fontWeight="bold"
                                         color="white"
                                         w="full"
-                                        noOfLines={1}
+                                        noOfLines={{ base: 2, md: 1 }}
                                     >
                                         {title}
                                     </Text>
 
                                     {/* Stats + date */}
-                                    <HStack justify="space-between" w="full" align="center">
+                                    <HStack
+                                        justify="space-between"
+                                        w="full"
+                                        align={{ base: "flex-start", sm: "center" }}
+                                        direction={{ base: "column", sm: "row" }}
+                                        spacing={{ base: 1, sm: 2 }}
+                                    >
                                         <Text fontSize="xs" color="gray.400">
                                             <Text as="span" color="white" fontWeight="semibold">
                                                 {rankedCount}
@@ -241,16 +247,17 @@ export const TierListsTab = () => {
                 </SimpleGrid>
             ) : (
                 <Center
-                    py={20}
+                    py={{ base: 12, md: 20 }}
+                    px={4}
                     border="2px dashed"
                     borderColor="brand.700"
                     borderRadius="2xl"
                 >
                     <VStack spacing={2}>
-                        <Text color="gray.500" fontWeight="medium">
+                        <Text color="gray.500" fontWeight="medium" textAlign="center">
                             No tier lists found.
                         </Text>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color="gray.600" textAlign="center">
                             Click 'New Entry' to start creating.
                         </Text>
                     </VStack>

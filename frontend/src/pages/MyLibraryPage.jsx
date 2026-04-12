@@ -3,13 +3,14 @@ import {
     Box,
     Container,
     Heading,
+    Text,
+    Flex,
     Tabs,
     TabList,
     TabPanels,
     Tab,
     TabPanel,
     Button,
-    HStack,
     useDisclosure,
     Icon,
 } from "@chakra-ui/react";
@@ -50,17 +51,23 @@ export const MyLibraryPage = () => {
     };
 
     return (
-        <Container maxW="container.xl" py={8}>
-            <HStack justify="space-between" mb={8} align="center">
+        <Container maxW="container.xl" py={{ base: 4, md: 8 }} px={{ base: 3, sm: 4, md: 6 }}>
+            <Flex
+                justify="space-between"
+                mb={{ base: 5, md: 8 }}
+                align={{ base: "flex-start", md: "center" }}
+                direction={{ base: "column", md: "row" }}
+                gap={{ base: 2, md: 0 }}
+            >
                 <Box>
-                    <Heading size="xl" color="white">
+                    <Heading size={{ base: "lg", md: "xl" }} color="white">
                         My Library
                     </Heading>
-                    <Heading size="xs" color="gray.500" mt={1}>
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" mt={1}>
                         Manage your collections and rankings
-                    </Heading>
+                    </Text>
                 </Box>
-            </HStack>
+            </Flex>
 
             <Tabs
                 variant="soft-rounded"
@@ -68,20 +75,33 @@ export const MyLibraryPage = () => {
                 index={tabIndex}
                 onChange={(index) => setSearchParams({ tab: TAB_NAMES[index] })}
             >
-                <HStack justify="space-between" mb={6}>
-                    <TabList bg="brand.800" p={1} borderRadius="full">
-                        <Tab px={6} gap={2}>
-                            <Icon as={FaListUl} /> Collections
-                        </Tab>
-                        <Tab px={6} gap={2}>
-                            <Icon as={FaLayerGroup} /> Tier Lists
-                        </Tab>
-                        <Tab px={6} gap={2}>
-                            <Icon as={FaSortAmountDown} /> Rankings
-                        </Tab>
-                    </TabList>
+                <Flex
+                    justify="space-between"
+                    mb={{ base: 4, md: 6 }}
+                    direction={{ base: "column", md: "row" }}
+                    gap={{ base: 3, md: 0 }}
+                    align={{ base: "stretch", md: "center" }}
+                >
+                    <Box overflowX="auto" pb={1}>
+                        <TabList bg="brand.800" p={1} borderRadius="full" minW="max-content" w="fit-content">
+                            <Tab px={{ base: 3, md: 6 }} gap={2} whiteSpace="nowrap">
+                                <Icon as={FaListUl} />
+                                <Text display={{ base: "none", sm: "inline" }}>Collections</Text>
+                                <Text display={{ base: "inline", sm: "none" }}>Lists</Text>
+                            </Tab>
+                            <Tab px={{ base: 3, md: 6 }} gap={2} whiteSpace="nowrap">
+                                <Icon as={FaLayerGroup} />
+                                <Text display={{ base: "none", sm: "inline" }}>Tier Lists</Text>
+                                <Text display={{ base: "inline", sm: "none" }}>Tiers</Text>
+                            </Tab>
+                            <Tab px={{ base: 3, md: 6 }} gap={2} whiteSpace="nowrap">
+                                <Icon as={FaSortAmountDown} />
+                                <Text display={{ base: "none", sm: "inline" }}>Rankings</Text>
+                                <Text display={{ base: "inline", sm: "none" }}>Ranks</Text>
+                            </Tab>
+                        </TabList>
+                    </Box>
 
-                    {/* The Smart Button */}
                     <Button
                         leftIcon={<FaPlus />}
                         colorScheme="purple"
@@ -89,10 +109,12 @@ export const MyLibraryPage = () => {
                         onClick={onOpen}
                         // Disable button for "Rankings" tab since it's not ready
                         isDisabled={tabIndex === 2}
+                        w={{ base: "100%", md: "auto" }}
+                        size={{ base: "sm", md: "md" }}
                     >
                         {getButtonLabel()}
                     </Button>
-                </HStack>
+                </Flex>
 
                 <TabPanels>
                     {/* Tab 0: Collections */}

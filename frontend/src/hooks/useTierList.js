@@ -34,6 +34,11 @@ export const useTierList = (tierListId) => {
         unranked: [],
     });
 
+    const normalizeGameId = useCallback((value) => {
+        if (value === undefined || value === null) return null;
+        return value.toString();
+    }, []);
+
     // Always-current refs — lets stable useCallbacks read latest state without closures
     const itemsRef = useRef(items);
     itemsRef.current = items;
@@ -88,7 +93,7 @@ export const useTierList = (tierListId) => {
         const loadData = async () => {
             try {
                 const data = await getTierList(tierListId);
-                console.log("Loaded Data:", data);
+                
 
                 setListTitle(data.title || data.name || "Untitled Tier List");
 
@@ -266,10 +271,21 @@ export const useTierList = (tierListId) => {
 
     const handleAddGame = useCallback((game) => {
         const currentItems = itemsRef.current;
-        const gameId = game.igdbId || game.id;
+        const gameId = normalizeGameId(game.igdbId || game.id);
+
+        if (!gameId) {
+            return toast({
+                title: "Could not add game",
+                description: "Missing game id.",
+                status: "error",
+                duration: 1500,
+            });
+        }
+
         const exists = Object.values(currentItems)
             .flat()
-            .some((g) => (g.igdbId || g.id) === gameId);
+            .some((g) => normalizeGameId(g.igdbId || g.id) === gameId);
+
         if (exists)
             return toast({
                 title: "Already added",
@@ -277,10 +293,21 @@ export const useTierList = (tierListId) => {
                 duration: 1000,
             });
 
-        const newItems = { ...currentItems, unranked: [...currentItems.unranked, game] };
+        const normalizedGame = {
+            ...game,
+            igdbId: game.igdbId || game.id,
+            id: game.id || game.igdbId,
+            title: game.title || game.name,
+            coverUrl: game.coverUrl || (game.cover ? game.cover.url : ""),
+        };
+
+        const newItems = {
+            ...currentItems,
+            unranked: [...currentItems.unranked, normalizedGame],
+        };
         setItems(newItems);
         pushHistory(newItems, tierDefsRef.current);
-    }, [pushHistory, toast]);
+    }, [normalizeGameId, pushHistory, toast]);
 
     // --- SAVE ---
 

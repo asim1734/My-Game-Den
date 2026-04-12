@@ -9,6 +9,8 @@ import {
     HStack,
     Tag,
     SimpleGrid,
+    Wrap,
+    WrapItem,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -41,7 +43,7 @@ const GENRES = [
 // --- GENRE STRIP ---
 const GenreStrip = () => {
     return (
-        <Box mb={8}>
+        <Box mb={{ base: 6, md: 8 }}>
             <Heading
                 size="xs"
                 color="gray.500"
@@ -51,26 +53,27 @@ const GenreStrip = () => {
             >
                 Browse by Genre
             </Heading>
-            <Flex gap={2} flexWrap="wrap">
+            <Wrap spacing={2}>
                 {GENRES.map(({ label, color }) => (
-                    <Tag
-                        as={RouterLink}
-                        to={`/browse?genre=${encodeURIComponent(label)}`}
-                        key={label}
-                        size="md"
-                        variant="subtle"
-                        colorScheme={color}
-                        cursor="pointer"
-                        transition="all 0.15s"
-                        px={4}
-                        py={2}
-                        borderRadius="full"
-                        _hover={{ opacity: 0.85, transform: "translateY(-1px)" }}
-                    >
-                        {label}
-                    </Tag>
+                    <WrapItem key={label}>
+                        <Tag
+                            as={RouterLink}
+                            to={`/browse?genre=${encodeURIComponent(label)}`}
+                            size="sm"
+                            variant="subtle"
+                            colorScheme={color}
+                            cursor="pointer"
+                            transition="all 0.15s"
+                            px={{ base: 3, md: 4 }}
+                            py={{ base: 1.5, md: 2 }}
+                            borderRadius="full"
+                            _hover={{ opacity: 0.85, transform: "translateY(-1px)" }}
+                        >
+                            {label}
+                        </Tag>
+                    </WrapItem>
                 ))}
-            </Flex>
+            </Wrap>
         </Box>
     );
 };
@@ -91,8 +94,14 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
     const skeletons = Array(10).fill(0);
 
     return (
-        <Box my={8}>
-            <Flex justify="space-between" align="flex-end" mb={4}>
+        <Box my={{ base: 6, md: 8 }}>
+            <Flex
+                justify="space-between"
+                align={{ base: "flex-start", sm: "flex-end" }}
+                direction={{ base: "column", sm: "row" }}
+                gap={{ base: 2, sm: 3 }}
+                mb={4}
+            >
                 <Box>
                     <Heading size="md" color="white">
                         {title}
@@ -112,6 +121,7 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
                         colorScheme="purple"
                         rightIcon={<FaArrowRight />}
                         flexShrink={0}
+                        alignSelf={{ base: "flex-start", sm: "auto" }}
                     >
                         View All
                     </Button>
@@ -119,10 +129,20 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             </Flex>
 
             {isLoading && (
-                <Box overflowX="auto" pb={4}>
-                    <Flex gap={4} flexWrap="nowrap">
+                <Box
+                    overflowX="auto"
+                    pb={4}
+                    sx={{
+                        "&::-webkit-scrollbar": { height: "8px" },
+                        "&::-webkit-scrollbar-thumb": {
+                            background: "var(--chakra-colors-brand-700)",
+                            borderRadius: "24px",
+                        },
+                    }}
+                >
+                    <Flex gap={{ base: 3, md: 4 }} flexWrap="nowrap" pr={1}>
                         {skeletons.map((_, index) => (
-                            <GameCardSkeleton key={index} />
+                            <GameCardSkeleton key={index} variant="dashboard" />
                         ))}
                     </Flex>
                 </Box>
@@ -137,10 +157,24 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             )}
 
             {games && (
-                <Box overflowX="auto" pb={4}>
-                    <Flex gap={4} flexWrap="nowrap">
+                <Box
+                    overflowX="auto"
+                    pb={4}
+                    sx={{
+                        "&::-webkit-scrollbar": { height: "8px" },
+                        "&::-webkit-scrollbar-thumb": {
+                            background: "var(--chakra-colors-brand-700)",
+                            borderRadius: "24px",
+                        },
+                    }}
+                >
+                    <Flex gap={{ base: 3, md: 4 }} flexWrap="nowrap" pr={1}>
                         {games.map((game) => (
-                            <GameCard key={game.igdbId} game={game} />
+                            <GameCard
+                                key={game.igdbId}
+                                game={game}
+                                variant="dashboard"
+                            />
                         ))}
                     </Flex>
                 </Box>
@@ -171,11 +205,17 @@ const PersonalizedSection = () => {
     const hasCollections = collections && collections.length > 0;
 
     return (
-        <Box my={8}>
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+        <Box my={{ base: 6, md: 8 }}>
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 4, md: 6 }}>
                 {/* --- Collections Column --- */}
                 <Box>
-                    <Flex justify="space-between" align="flex-end" mb={3}>
+                    <Flex
+                        justify="space-between"
+                        align={{ base: "flex-start", sm: "flex-end" }}
+                        direction={{ base: "column", sm: "row" }}
+                        gap={{ base: 2, sm: 3 }}
+                        mb={3}
+                    >
                         <Box>
                             <Heading size="sm" color="white">
                                 Your Collections
@@ -192,6 +232,7 @@ const PersonalizedSection = () => {
                             colorScheme="purple"
                             rightIcon={<FaArrowRight />}
                             flexShrink={0}
+                            alignSelf={{ base: "flex-start", sm: "auto" }}
                         >
                             View All
                         </Button>
@@ -204,7 +245,7 @@ const PersonalizedSection = () => {
                             border="2px dashed"
                             borderColor="brand.700"
                             borderRadius="xl"
-                            p={6}
+                            p={{ base: 4, md: 6 }}
                             direction="column"
                             gap={2}
                         >
@@ -277,7 +318,13 @@ const PersonalizedSection = () => {
 
                 {/* --- Tier Lists Column --- */}
                 <Box>
-                    <Flex justify="space-between" align="flex-end" mb={3}>
+                    <Flex
+                        justify="space-between"
+                        align={{ base: "flex-start", sm: "flex-end" }}
+                        direction={{ base: "column", sm: "row" }}
+                        gap={{ base: 2, sm: 3 }}
+                        mb={3}
+                    >
                         <Box>
                             <Heading size="sm" color="white">
                                 Your Tier Lists
@@ -294,6 +341,7 @@ const PersonalizedSection = () => {
                             colorScheme="purple"
                             rightIcon={<FaArrowRight />}
                             flexShrink={0}
+                            alignSelf={{ base: "flex-start", sm: "auto" }}
                         >
                             View All
                         </Button>
@@ -306,7 +354,7 @@ const PersonalizedSection = () => {
                             border="2px dashed"
                             borderColor="brand.700"
                             borderRadius="xl"
-                            p={6}
+                            p={{ base: 4, md: 6 }}
                             direction="column"
                             gap={2}
                         >
@@ -332,8 +380,10 @@ const PersonalizedSection = () => {
                                     bg="brand.800"
                                     borderRadius="lg"
                                     p={3}
-                                    align="center"
+                                    align={{ base: "stretch", sm: "center" }}
                                     justify="space-between"
+                                    direction={{ base: "column", sm: "row" }}
+                                    gap={{ base: 2, sm: 0 }}
                                     border="1px solid"
                                     borderColor="brand.700"
                                     _hover={{ borderColor: "purple.600" }}
@@ -381,7 +431,8 @@ const PersonalizedSection = () => {
                                         colorScheme="purple"
                                         variant="ghost"
                                         flexShrink={0}
-                                        ml={2}
+                                        w={{ base: "100%", sm: "auto" }}
+                                        ml={{ base: 0, sm: 2 }}
                                     >
                                         Continue
                                     </Button>
@@ -400,7 +451,7 @@ export const DashboardPage = () => {
     const isLoggedIn = !!localStorage.getItem("x-auth-token");
 
     return (
-        <Box p={8}>
+        <Box p={{ base: 3, sm: 4, md: 8 }} maxW="1600px" mx="auto">
             <GenreStrip />
 
             <GameRow

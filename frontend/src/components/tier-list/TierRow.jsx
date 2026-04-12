@@ -67,7 +67,7 @@ function TierRowInner({ id, label, color, games, onUpdate, onDelete, onRemove })
             bg="blackAlpha.400"
             borderRadius="md"
             overflow="hidden"
-            minH="100px"
+            minH={{ base: "82px", md: "100px" }}
             style={{
                 transform: CSS.Transform.toString(transform),
                 transition,
@@ -80,7 +80,7 @@ function TierRowInner({ id, label, color, games, onUpdate, onDelete, onRemove })
                 {...attributes}
                 {...listeners}
                 data-export-hide="true"
-                w="18px"
+                w={{ base: "14px", md: "18px" }}
                 bg="blackAlpha.200"
                 align="center"
                 justify="center"
@@ -97,7 +97,7 @@ function TierRowInner({ id, label, color, games, onUpdate, onDelete, onRemove })
             <Popover placement="right-start">
                 <PopoverTrigger>
                     <Box
-                        w="80px"
+                        w={{ base: "62px", md: "80px" }}
                         bg={color}
                         position="relative"
                         display="flex"
@@ -132,7 +132,7 @@ function TierRowInner({ id, label, color, games, onUpdate, onDelete, onRemove })
                             position="absolute"
                             top="0"
                             right="0"
-                            opacity={0}
+                            opacity={{ base: 1, md: 0 }}
                             _groupHover={{ opacity: 1 }}
                             aria-label="Edit Tier"
                             zIndex={2}
@@ -224,13 +224,13 @@ function TierRowInner({ id, label, color, games, onUpdate, onDelete, onRemove })
             </Popover>
 
             {/* GAMES AREA */}
-            <Box ref={setDropRef} flex={1} p={2} minW="0">
+            <Box ref={setDropRef} flex={1} p={{ base: 1.5, md: 2 }} minW="0">
                 <SortableContext
                     id={id}
                     items={games.map((g) => g.igdbId || g.id)}
                     strategy={rectSortingStrategy}
                 >
-                    <Flex wrap="wrap" gap={2} minH="80px" align="center">
+                    <Flex wrap="wrap" gap={{ base: 1.5, md: 2 }} minH={{ base: "62px", md: "80px" }} align="center">
                         {games.length === 0 ? (
                             <Text
                                 fontSize="xs"

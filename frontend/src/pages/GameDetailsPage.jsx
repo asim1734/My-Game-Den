@@ -27,6 +27,8 @@ import {
     AlertTitle,
     AlertDescription,
     SimpleGrid,
+    Wrap,
+    WrapItem,
 } from "@chakra-ui/react";
 import { FaChevronDown, FaLock } from "react-icons/fa";
 import { useGameActions } from "../hooks/useGameActions";
@@ -107,21 +109,21 @@ const SidebarGameList = ({
                             borderColor="whiteAlpha.200"
                             bg="whiteAlpha.50"
                             borderRadius="md"
-                            p={2}
+                            p={{ base: 2, md: 2.5 }}
                             _hover={{
                                 bg: "whiteAlpha.100",
                                 borderColor: "teal.400",
                             }}
                         >
-                            <HStack align="flex-start" spacing={3}>
+                            <HStack align="flex-start" spacing={{ base: 2, md: 3 }}>
                                 <Image
                                     src={
                                         relatedGame.coverUrl ||
                                         "https://via.placeholder.com/60x80?text=No+Cover"
                                     }
                                     alt={relatedGame.title}
-                                    w="54px"
-                                    h="72px"
+                                    w={{ base: "46px", sm: "54px" }}
+                                    h={{ base: "64px", sm: "72px" }}
                                     objectFit="cover"
                                     borderRadius="sm"
                                     flexShrink={0}
@@ -137,7 +139,7 @@ const SidebarGameList = ({
                                         {relatedGame.title}
                                     </Text>
 
-                                    <HStack spacing={2} wrap="wrap">
+                                    <Wrap spacing={2}>
                                         {relatedGame.relation && (
                                             <Tag
                                                 size="sm"
@@ -166,7 +168,7 @@ const SidebarGameList = ({
                                                 /100
                                             </Text>
                                         )}
-                                    </HStack>
+                                    </Wrap>
                                 </VStack>
                             </HStack>
                         </Box>
@@ -240,7 +242,7 @@ export const GameDetailsPage = () => {
         <Box bg="brand.900" minH="100vh" overflowX="hidden">
             {/* --- Hero Section --- */}
             <Box
-                h={{ base: "300px", md: "450px" }}
+                h={{ base: "240px", sm: "320px", md: "450px" }}
                 bgImage={`url(${heroScreenshot})`}
                 bgSize="cover"
                 bgPosition="center 25%"
@@ -251,27 +253,23 @@ export const GameDetailsPage = () => {
                     w="100%"
                     direction="column"
                     justify="flex-end"
-                    p={{ base: 4, md: 8 }}
+                    p={{ base: 3, sm: 4, md: 8 }}
                     bgGradient="linear(to-t, brand.900 10%, transparent 70%)"
                 >
                     <VStack align="flex-start" spacing={3}>
                         <Heading
                             as="h1"
-                            size={{ base: "xl", md: "3xl" }}
+                            size={{ base: "lg", sm: "xl", md: "3xl" }}
                             color="white"
                             textShadow="2px 2px 8px black"
+                            maxW={{ base: "100%", md: "85%" }}
                         >
                             {game.title}
-                            <Text
-                                as="span"
-                                color="gray.400"
-                                ml={4}
-                                fontWeight="normal"
-                                fontSize={{ base: "lg", md: "2xl" }}
-                            >
-                                ({releaseYear})
-                            </Text>
                         </Heading>
+
+                        <Text color="gray.300" fontSize={{ base: "sm", md: "md" }}>
+                            {releaseYear === "N/A" ? "Release year unknown" : `Released ${releaseYear}`}
+                        </Text>
 
                         <HStack spacing={2} wrap="wrap">
                             {game.status && (
@@ -290,14 +288,14 @@ export const GameDetailsPage = () => {
             {/* --- Main Content Section --- */}
             <Grid
                 templateColumns={{ base: "1fr", lg: "320px 1fr" }}
-                gap={{ base: 8, md: 12 }}
-                p={{ base: 4, md: 8 }}
+                gap={{ base: 6, md: 10, lg: 12 }}
+                p={{ base: 3, sm: 4, md: 8 }}
                 maxW="1400px"
                 mx="auto"
                 w="100%"
             >
                 {/* Left Column (Sidebar) */}
-                <GridItem w="100%">
+                <GridItem w="100%" order={{ base: 2, lg: 1 }}>
                     <VStack spacing={6} align="stretch">
                         <Image
                             src={game.coverUrl}
@@ -306,6 +304,9 @@ export const GameDetailsPage = () => {
                             boxShadow="2xl"
                             border="4px solid"
                             borderColor="whiteAlpha.200"
+                            w={{ base: "100%", sm: "280px", lg: "100%" }}
+                            maxW="100%"
+                            mx={{ base: "auto", lg: 0 }}
                             fallbackSrc="https://via.placeholder.com/320x450?text=No+Cover"
                         />
 
@@ -318,7 +319,7 @@ export const GameDetailsPage = () => {
                                         isLoading={isAdding}
                                         colorScheme="teal"
                                         width="100%"
-                                        size="lg"
+                                        size={{ base: "md", md: "lg" }}
                                     >
                                         Add to List
                                     </MenuButton>
@@ -368,17 +369,19 @@ export const GameDetailsPage = () => {
                             <Heading size="sm" mb={2}>
                                 Related Links
                             </Heading>
-                            <Flex gap={2} wrap="wrap">
+                            <Wrap spacing={2}>
                                 {game.websites?.length > 0 ? (
                                     game.websites.map((site) => (
-                                        <StoreLink key={site.id} website={site} />
+                                        <WrapItem key={site.id}>
+                                            <StoreLink website={site} />
+                                        </WrapItem>
                                     ))
                                 ) : (
                                     <Text fontSize="sm" color="gray.500">
                                         No related links available.
                                     </Text>
                                 )}
-                            </Flex>
+                            </Wrap>
                         </Box>
 
                         <SidebarGameList
@@ -396,14 +399,14 @@ export const GameDetailsPage = () => {
                 </GridItem>
 
                 {/* Right Column (Main Details) */}
-                <GridItem w="100%" minW={0}>
+                <GridItem w="100%" minW={0} order={{ base: 1, lg: 2 }}>
                     <VStack spacing={10} align="stretch" color="white" w="100%">
                         <Box>
                             <Heading size="lg" mb={4} borderLeft="4px solid" borderColor="teal.500" pl={4}>
                                 Quick Stats
                             </Heading>
 
-                            <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4}>
+                            <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={4}>
                                 <Box p={4} borderRadius="lg" bg="whiteAlpha.100" border="1px solid" borderColor="whiteAlpha.200">
                                     <Text fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="wide">
                                         User Score
@@ -533,8 +536,8 @@ export const GameDetailsPage = () => {
                                             key={index}
                                             src={ss}
                                             alt="Screenshot"
-                                            h="200px"
-                                            minW="350px"
+                                            h={{ base: "150px", sm: "180px", md: "200px" }}
+                                            minW={{ base: "260px", sm: "320px", md: "350px" }}
                                             objectFit="cover"
                                             borderRadius="lg"
                                         />

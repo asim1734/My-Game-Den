@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import {
+    Box,
     Card,
     CardBody,
     Heading,
@@ -36,9 +37,10 @@ import { useGameActions } from "../hooks/useGameActions";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUserLists } from "../api";
 
-const GameCard = ({ game, variant = "dashboard" }) => {
+const GameCard = ({ game, variant = "grid" }) => {
     // 1. Check Auth Status
     const isLoggedIn = !!localStorage.getItem("x-auth-token");
+    const isDashboardCard = variant === "dashboard";
 
     const { handleAddGame, isAdding, handleRemoveGame, isRemoving } =
         useGameActions(game);
@@ -75,12 +77,28 @@ const GameCard = ({ game, variant = "dashboard" }) => {
     return (
         <LinkBox
             as={Card}
-            minWidth="180px"
+            minW={
+                isDashboardCard
+                    ? { base: "146px", sm: "164px", md: "180px" }
+                    : 0
+            }
+            w={
+                isDashboardCard
+                    ? { base: "146px", sm: "164px", md: "180px" }
+                    : "100%"
+            }
+            h={
+                isDashboardCard
+                    ? { base: "360px", sm: "392px", md: "430px" }
+                    : "100%"
+            }
+            flexShrink={isDashboardCard ? 0 : 1}
+            scrollSnapAlign={isDashboardCard ? "start" : undefined}
             borderRadius="lg"
             boxShadow="md"
             display="flex"
             flexDirection="column"
-            overflow="visible"
+            overflow="hidden"
             bg="brand.800"
             border="1px solid"
             borderColor="whiteAlpha.100"
@@ -107,12 +125,21 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                 />
             </AspectRatio>
 
-            <CardBody p={3} flex="1" display="flex" flexDirection="column">
-                <HStack justify="space-between" mb={2}>
+            <CardBody
+                p={
+                    isDashboardCard
+                        ? { base: 2.5, md: 3 }
+                        : { base: 2, sm: 2.5, md: 3 }
+                }
+                flex="1"
+                display="flex"
+                flexDirection="column"
+            >
+                <HStack justify="space-between" mb={2} minH="20px">
                     {game.rating && (
                         <Badge
                             colorScheme={getRatingColor(game.rating)}
-                            px="1.5"
+                            px={isDashboardCard ? "1" : "1.5"}
                             borderRadius="md"
                         >
                             <Flex align="center">
@@ -123,6 +150,7 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                             </Flex>
                         </Badge>
                     )}
+                    {!game.rating && <Box minW="45px" h="20px" />}
                     <Flex align="center" color="gray.400">
                         <Icon as={FaCalendarAlt} mr="1.5" boxSize={3} />
                         <Text fontSize="xs">{releaseYear}</Text>
@@ -130,12 +158,24 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                 </HStack>
 
                 <LinkOverlay as={RouterLink} to={`/game/${game.igdbId}`}>
-                    <Heading size="sm" noOfLines={2} title={game.title} mb={2} color="white">
+                    <Heading
+                        size={
+                            isDashboardCard
+                                ? "xs"
+                                : { base: "xs", lg: "sm" }
+                        }
+                        noOfLines={2}
+                        title={game.title}
+                        mb={2}
+                        minH="2.6em"
+                        lineHeight="1.3"
+                        color="white"
+                    >
                         {game.title}
                     </Heading>
                 </LinkOverlay>
 
-                <VStack align="start" spacing={1} color="gray.400">
+                <VStack align="start" spacing={1} color="gray.400" minH="38px">
                     {game.genres?.length > 0 && (
                         <HStack spacing={1}>
                             <Icon as={FaTags} boxSize={3} color="teal.500" />
@@ -161,7 +201,11 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     <Menu closeOnSelect={false}>
                         <MenuButton
                             as={Button}
-                            size="sm"
+                            size={
+                                isDashboardCard
+                                    ? "xs"
+                                    : { base: "xs", md: "sm" }
+                            }
                             width="100%"
                             mt={3}
                             colorScheme="teal"
@@ -170,7 +214,12 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                         >
                             Manage Lists...
                         </MenuButton>
-                        <MenuList bg="gray.800" minWidth="180px" zIndex={20} borderColor="gray.700">
+                        <MenuList
+                            bg="gray.800"
+                            minWidth={isDashboardCard ? "160px" : "180px"}
+                            zIndex={20}
+                            borderColor="gray.700"
+                        >
                             {isListsLoading && (
                                 <Center p={2}>
                                     <Spinner size="sm" color="teal.500" />
@@ -212,7 +261,11 @@ const GameCard = ({ game, variant = "dashboard" }) => {
                     <Button
                         as={RouterLink}
                         to="/login"
-                        size="sm"
+                        size={
+                            isDashboardCard
+                                ? "xs"
+                                : { base: "xs", md: "sm" }
+                        }
                         width="100%"
                         mt={3}
                         variant="outline"

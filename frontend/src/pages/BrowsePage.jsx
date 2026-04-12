@@ -89,7 +89,7 @@ export const BrowsePage = () => {
     return (
         <>
             {/* Mobile filter button — only visible below lg */}
-            <Box display={{ base: "flex", lg: "none" }} px={8} pt={6}>
+            <Box display={{ base: "flex", lg: "none" }} px={{ base: 3, sm: 4, md: 8 }} pt={{ base: 3, md: 6 }}>
                 <Button
                     leftIcon={<FiSliders />}
                     variant="outline"
@@ -104,8 +104,8 @@ export const BrowsePage = () => {
 
             <Grid
                 templateColumns={{ base: "1fr", lg: "280px 1fr" }}
-                gap={8}
-                p={8}
+                gap={{ base: 4, md: 8 }}
+                p={{ base: 3, sm: 4, md: 8 }}
             >
                 {/* Desktop sidebar */}
                 <GridItem display={{ base: "none", lg: "block" }}>
