@@ -9,11 +9,19 @@ A full-stack web application for tracking your video game library, creating tier
 - **Advanced Search** — Real-time search with `Ctrl+K` keyboard shortcut
 - **Browse with Filters** — Filter by genre, platform, rating, and release year
 - **Game Details** — View screenshots, trailers, platforms, genres, and external links
+- **Search Sorting & Pagination** — Sort by popularity/rating/release date and move through paged results
+- **Rich Metadata Panels** — See storyline, developers, publishers, age ratings, themes, engines, and keywords
+- **Related Content** — Discover similar games plus DLC/expansion recommendations from IGDB
+- **Genre Quick-Jump** — Jump into pre-filtered browse views directly from dashboard genre tags
+- **Mobile Filter Drawer** — Use browse filters from a slide-out drawer on small screens
 
 ### Collections & Library
 - **Game Lists** — Create custom collections (default: Collection, Wishlist)
 - **Organize Games** — Add/remove games from any list
 - **Library Dashboard** — Quick access to all your collections and tier lists
+- **Collection Management** — Rename/delete custom collections (default lists are protected)
+- **Collection Detail Pages** — Open a collection to view full game cards, counts, and empty/loading states
+- **Personalized Home Widgets** — Logged-in users get quick resume cards for collections and tier lists
 
 ### Tier List Creator
 - **Drag & Drop Editor** — Intuitive tier list builder with smooth animations
@@ -21,11 +29,23 @@ A full-stack web application for tracking your video game library, creating tier
 - **Game Search** — Search and add any game from IGDB's database
 - **Undo/Redo** — `Ctrl+Z` / `Ctrl+Y` support
 - **Export as Image** — Save your tier list as a PNG
+- **Tier Row Reordering** — Reorder entire tier rows via drag-and-drop
+- **Save State Awareness** — Unsaved-changes indicator with leave-page protection
+- **Fast Cleanup** — Remove games from tiers directly or by dragging to trash
+- **Resume Editing** — Continue a tier list from dashboard/library shortcuts
 
 ### Reviews
 - **Write Reviews** — Rate games 1-5 stars with optional text
 - **Community Reviews** — See what others think about each game
 - **Review History** — View and manage all your reviews
+- **Inline Review Editing** — Edit or delete your existing review from the game page
+- **Per-Game Review Lookup** — Automatically loads your saved review when opening a game
+- **Community Snapshot** — Displays average score and total review count at a glance
+
+### Authentication & UX
+- **Protected Areas** — Library, list management, tier lists, and reviews require auth
+- **Session Guard** — Invalid/expired tokens trigger automatic client logout on `401`
+- **Responsive Navigation** — Mobile drawer navigation and desktop account shortcuts
 
 ## Tech Stack
 
@@ -131,6 +151,8 @@ My-Game-Den/
 
 ## API Endpoints
 
+Protected endpoints require an `x-auth-token` header.
+
 ### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -146,24 +168,26 @@ My-Game-Den/
 | GET | `/api/games/search` | Search games |
 | GET | `/api/games/browse` | Browse with filters |
 | GET | `/api/games/:id` | Get game details |
+| POST | `/api/games/by-ids` | Fetch multiple games by IGDB IDs |
 
 ### User Lists (Protected)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/users/lists` | Get all user lists |
 | POST | `/api/users/lists` | Create new list |
-| PUT | `/api/users/lists/:name` | Rename list |
-| DELETE | `/api/users/lists/:name` | Delete list |
-| POST | `/api/users/lists/:name/games` | Add game to list |
-| DELETE | `/api/users/lists/:name/games/:id` | Remove game |
+| PUT | `/api/users/lists/:listName` | Rename list |
+| DELETE | `/api/users/lists/:listName` | Delete list |
+| POST | `/api/users/lists/:listName/games` | Add game to list |
+| DELETE | `/api/users/lists/:listName/games/:gameId` | Remove game |
 
 ### Reviews (Protected)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/reviews/my-reviews` | Get user's reviews |
+| GET | `/api/reviews/game/:gameId` | Get logged-in user's review for a game |
 | POST | `/api/reviews` | Create/update review |
-| DELETE | `/api/reviews/game/:id` | Delete review |
-| GET | `/api/reviews/community/:id` | Get community reviews |
+| DELETE | `/api/reviews/game/:gameId` | Delete review |
+| GET | `/api/reviews/community/:gameId` | Get community reviews |
 
 ### Tier Lists (Protected)
 | Method | Endpoint | Description |
