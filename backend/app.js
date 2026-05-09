@@ -28,6 +28,11 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("MongoDB connection established!"))
     .catch((err) => console.error("MongoDB connection error:", err));
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "OK" });
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/games", gamesRouter);
 
