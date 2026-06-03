@@ -212,19 +212,6 @@ pnpm build    # Build for production
 pnpm preview  # Preview production build
 pnpm lint     # Run ESLint
 ```
-
-## Deployment
-
-### Frontend (Vercel)
-The frontend includes a `vercel.json` configured for SPA routing. Deploy directly from GitHub or run:
-```bash
-cd frontend
-vercel
-```
-
-### Backend
-Deploy to any Node.js host (Railway, Render, Fly.io, etc.). Ensure environment variables are set.
-
 ## License
 
 MIT
