@@ -33,10 +33,13 @@ export const UnrankedPool = ({ games, id = "unranked", onRemove }) => {
                 <Text
                     color="gray.300"
                     fontWeight="900"
-                    fontSize="xs"
+                    fontSize={{ base: "9px", md: "xs" }}
                     textAlign="center"
                     textTransform="uppercase"
                     lineHeight="1.1"
+                    wordBreak="break-word"
+                    overflowWrap="anywhere"
+                    whiteSpace="normal"
                 >
                     UNRANKED
                 </Text>

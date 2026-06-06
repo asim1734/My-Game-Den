@@ -127,7 +127,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                         {isSearchLoading ? (
                             <Box textAlign="center" py={10}><Spinner color="purple.500" /></Box>
                         ) : searchResults && searchResults.length > 0 ? (
-                            <SimpleGrid columns={{ base: 3, sm: 4, md: 3 }} spacing={{ base: 2, md: 3 }}>
+                            <SimpleGrid minChildWidth="80px" spacing={{ base: 2, md: 3 }}>
                                 {searchResults.map((game) => (
                                     <TierGameCard 
                                         key={game.igdbId || game.id} 
@@ -184,7 +184,7 @@ export const GamePickerSidebar = ({ onAddGame }) => {
                         {isCollectionLoading ? (
                              <Box textAlign="center" py={10}><Spinner color="purple.500" /></Box>
                         ) : collectionGames && collectionGames.length > 0 ? (
-                            <SimpleGrid columns={{ base: 3, sm: 4, md: 3 }} spacing={{ base: 2, md: 3 }}>
+                            <SimpleGrid minChildWidth="80px" spacing={{ base: 2, md: 3 }}>
                                 {collectionGames.map((game) => (
                                     <TierGameCard 
                                         key={game.igdbId || game.id} 

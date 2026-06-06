@@ -1,16 +1,12 @@
 import React from "react";
-import { Box, Image, Tooltip, IconButton } from "@chakra-ui/react";
+import { Box, Image, Tooltip, IconButton, AspectRatio } from "@chakra-ui/react";
 import { FaTimes } from "react-icons/fa";
 
 export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => {
     const isSidebar = variant === "sidebar";
     
-    const width = isSidebar
-        ? { base: "58px", sm: "64px", md: "70px" }
-        : { base: "50px", sm: "54px", md: "60px" };
-    const height = isSidebar
-        ? { base: "78px", sm: "86px", md: "93px" }
-        : { base: "66px", sm: "72px", md: "80px" };
+    const width = isSidebar ? "100%" : { base: "50px", sm: "54px", md: "60px" };
+    const height = isSidebar ? "auto" : { base: "66px", sm: "72px", md: "80px" };
 
     // --- DATA NORMALIZATION ---
     const gameTitle = game.title || game.name || "Unknown Game";
@@ -43,14 +39,27 @@ export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => 
                 onClick={() => onClick && onClick(game)}
                 role="group"
             >
-                <Image 
-                    src={displayCover} 
-                    alt={gameTitle} 
-                    w="full" 
-                    h="full" 
-                    objectFit="cover"
-                    onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=Error"; }}
-                />
+                {isSidebar ? (
+                    <AspectRatio ratio={3 / 4} w="full">
+                        <Image 
+                            src={displayCover} 
+                            alt={gameTitle} 
+                            w="full" 
+                            h="full" 
+                            objectFit="cover"
+                            onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=Error"; }}
+                        />
+                    </AspectRatio>
+                ) : (
+                    <Image 
+                        src={displayCover} 
+                        alt={gameTitle} 
+                        w="full" 
+                        h="full" 
+                        objectFit="cover"
+                        onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=Error"; }}
+                    />
+                )}
 
                 {!isSidebar && onRemove && (
                     <IconButton
