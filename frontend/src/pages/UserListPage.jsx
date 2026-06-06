@@ -41,11 +41,11 @@ export const UserListPage = () => {
 
     if (isInitialLoading) {
         return (
-            <Box p={8}>
+            <Box p={{ base: 2, sm: 4, md: 6 }}>
                 <Heading mb={6}>My {capitalize(listName)}</Heading>
                 <SimpleGrid
-                    columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-                    spacing={6}
+                    columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }}
+                    spacing={{ base: 2.5, sm: 4, md: 6 }}
                 >
                     {skeletons.map((_, index) => (
                         <GameCardSkeleton key={index} />
@@ -66,13 +66,13 @@ export const UserListPage = () => {
     }
 
     return (
-        <Box p={8}>
+        <Box p={{ base: 2, sm: 4, md: 6 }}>
             <Heading mb={6}>My {capitalize(listName)}</Heading>
 
             {listGames && listGames.length > 0 ? (
                 <SimpleGrid
-                    columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-                    spacing={6}
+                    columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }}
+                    spacing={{ base: 2.5, sm: 4, md: 6 }}
                 >
                     {listGames.map((game) => (
                         <GameCard

@@ -136,7 +136,7 @@ export function RootLayout() {
                 zIndex="sticky"
                 borderBottom="1px solid"
                 borderColor="brand.700"
-                gap={4}
+                gap={{ base: 2, sm: 4 }}
             >
                 {/* Mobile hamburger */}
                 <IconButton
@@ -188,7 +188,7 @@ export function RootLayout() {
                 <InputGroup
                     size="sm"
                     w={{
-                        base: searchFocused ? "200px" : "120px",
+                        base: searchFocused ? "180px" : "150px",
                         sm: searchFocused ? "300px" : "200px",
                         md: searchFocused ? "400px" : "300px",
                     }}
@@ -310,8 +310,7 @@ export function RootLayout() {
                                 as={RouterLink}
                                 to="/login"
                                 variant="ghost"
-                                size="sm"
-                                display={{ base: "none", sm: "flex" }}
+                                size={{ base: "xs", sm: "sm" }}
                             >
                                 Login
                             </Button>
@@ -319,7 +318,7 @@ export function RootLayout() {
                                 as={RouterLink}
                                 to="/register"
                                 colorScheme="purple"
-                                size="sm"
+                                size={{ base: "xs", sm: "sm" }}
                             >
                                 Register
                             </Button>
