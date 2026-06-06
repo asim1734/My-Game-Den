@@ -79,17 +79,17 @@ const GameCard = ({ game, variant = "grid" }) => {
             as={Card}
             minW={
                 isDashboardCard
-                    ? { base: "146px", sm: "164px", md: "180px" }
+                    ? { base: "110px", sm: "164px", md: "180px" }
                     : 0
             }
             w={
                 isDashboardCard
-                    ? { base: "146px", sm: "164px", md: "180px" }
+                    ? { base: "110px", sm: "164px", md: "180px" }
                     : "100%"
             }
             h={
                 isDashboardCard
-                    ? { base: "360px", sm: "392px", md: "430px" }
+                    ? { base: "220px", sm: "392px", md: "430px" }
                     : "100%"
             }
             flexShrink={isDashboardCard ? 0 : 1}
@@ -111,49 +111,128 @@ const GameCard = ({ game, variant = "grid" }) => {
             }}
             transition="all 0.2s ease-in-out"
         >
-            <AspectRatio
-                ratio={3 / 4}
-                width="100%"
-                borderTopRadius="lg"
-                overflow="hidden"
-            >
-                <Image 
-                    src={game.coverUrl} 
-                    alt={game.title} 
-                    objectFit="cover" 
-                    fallbackSrc="https://via.placeholder.com/300x400?text=No+Cover"
-                />
-            </AspectRatio>
+            <Box position="relative" width="100%">
+                <AspectRatio
+                    ratio={3 / 4}
+                    width="100%"
+                    borderTopRadius="lg"
+                    overflow="hidden"
+                >
+                    <Image 
+                        src={game.coverUrl} 
+                        alt={game.title} 
+                        objectFit="cover" 
+                        fallbackSrc="https://via.placeholder.com/300x400?text=No+Cover"
+                    />
+                </AspectRatio>
+                
+                {/* Floating List Management on Mobile/Dashboard Card */}
+                {isLoggedIn && isDashboardCard && (
+                    <Box
+                        position="absolute"
+                        top="4px"
+                        right="4px"
+                        zIndex="12"
+                        display={{ base: "block", sm: "none" }}
+                    >
+                        <Menu closeOnSelect={false}>
+                            <MenuButton
+                                as={IconButton}
+                                icon={<Icon as={FaPlus} boxSize="8px" />}
+                                size="xs"
+                                h="18px"
+                                minW="18px"
+                                w="18px"
+                                borderRadius="full"
+                                colorScheme="teal"
+                                variant="solid"
+                                aria-label="Manage lists"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                            />
+                            <MenuList
+                                bg="gray.800"
+                                minWidth="150px"
+                                zIndex={20}
+                                borderColor="gray.700"
+                            >
+                                {isListsLoading && (
+                                    <Center p={2}>
+                                        <Spinner size="xs" color="teal.500" />
+                                    </Center>
+                                )}
+                                {allLists &&
+                                    allLists.map((list) => {
+                                        const isInThisList = gameInLists.has(list.name);
+                                        return (
+                                            <MenuItem
+                                                key={list.name}
+                                                bg="gray.800"
+                                                _hover={{ bg: "gray.700" }}
+                                                icon={
+                                                    isInThisList ? (
+                                                        <Icon as={FaTrash} color="red.400" />
+                                                    ) : (
+                                                        <Icon as={FaPlus} color="green.400" />
+                                                    )
+                                                }
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    if (isInThisList) {
+                                                        handleRemoveGame(e, list.name);
+                                                    } else {
+                                                        handleAddGame(e, list.name);
+                                                    }
+                                                }}
+                                            >
+                                                <Text fontSize="xs">
+                                                    {isInThisList ? "Remove from" : "Add to"} {list.name}
+                                                </Text>
+                                            </MenuItem>
+                                        );
+                                    })}
+                            </MenuList>
+                        </Menu>
+                    </Box>
+                )}
+            </Box>
 
             <CardBody
                 p={
                     isDashboardCard
-                        ? { base: 2.5, md: 3 }
+                        ? { base: 1.5, sm: 2.5, md: 3 }
                         : { base: 2, sm: 2.5, md: 3 }
                 }
                 flex="1"
                 display="flex"
                 flexDirection="column"
             >
-                <HStack justify="space-between" mb={2} minH="20px">
+                <HStack 
+                    justify="space-between" 
+                    mb={isDashboardCard ? { base: 1, sm: 2 } : 2} 
+                    minH={isDashboardCard ? { base: "14px", sm: "20px" } : "20px"}
+                >
                     {game.rating && (
                         <Badge
                             colorScheme={getRatingColor(game.rating)}
-                            px={isDashboardCard ? "1" : "1.5"}
+                            px={isDashboardCard ? { base: "0.5", sm: "1" } : "1.5"}
                             borderRadius="md"
                         >
                             <Flex align="center">
-                                <Icon as={FaStar} mr="1" boxSize={3} />
-                                <Text as="b" fontSize="xs">
+                                <Icon as={FaStar} mr={isDashboardCard ? { base: "0.5", sm: "1" } : "1"} boxSize={isDashboardCard ? { base: 2.5, sm: 3 } : 3} />
+                                <Text as="b" fontSize={isDashboardCard ? { base: "9px", sm: "xs" } : "xs"}>
                                     {Math.round(game.rating)}
                                 </Text>
                             </Flex>
                         </Badge>
                     )}
-                    {!game.rating && <Box minW="45px" h="20px" />}
+                    {!game.rating && <Box minW={isDashboardCard ? { base: "30px", sm: "45px" } : "45px"} h={isDashboardCard ? { base: "14px", sm: "20px" } : "20px"} />}
                     <Flex align="center" color="gray.400">
-                        <Icon as={FaCalendarAlt} mr="1.5" boxSize={3} />
-                        <Text fontSize="xs">{releaseYear}</Text>
+                        <Icon as={FaCalendarAlt} mr={isDashboardCard ? { base: "0.5", sm: "1.5" } : "1.5"} boxSize={isDashboardCard ? { base: 2.5, sm: 3 } : 3} />
+                        <Text fontSize={isDashboardCard ? { base: "9px", sm: "xs" } : "xs"}>{releaseYear}</Text>
                     </Flex>
                 </HStack>
 
@@ -161,21 +240,28 @@ const GameCard = ({ game, variant = "grid" }) => {
                     <Heading
                         size={
                             isDashboardCard
-                                ? "xs"
+                                ? { base: "2xs", sm: "xs" }
                                 : { base: "xs", lg: "sm" }
                         }
                         noOfLines={2}
                         title={game.title}
-                        mb={2}
-                        minH="2.6em"
-                        lineHeight="1.3"
+                        mb={isDashboardCard ? { base: 1, sm: 2 } : 2}
+                        minH={isDashboardCard ? { base: "2.4em", sm: "2.6em" } : "2.6em"}
+                        lineHeight={isDashboardCard ? { base: "1.15", sm: "1.3" } : "1.3"}
                         color="white"
+                        fontSize={isDashboardCard ? { base: "10px", sm: "sm" } : undefined}
                     >
                         {game.title}
                     </Heading>
                 </LinkOverlay>
 
-                <VStack align="start" spacing={1} color="gray.400" minH="38px">
+                <VStack 
+                    align="start" 
+                    spacing={1} 
+                    color="gray.400" 
+                    minH="38px"
+                    display={isDashboardCard ? { base: "none", sm: "flex" } : "flex"}
+                >
                     {game.genres?.length > 0 && (
                         <HStack spacing={1}>
                             <Icon as={FaTags} boxSize={3} color="teal.500" />
@@ -211,6 +297,7 @@ const GameCard = ({ game, variant = "grid" }) => {
                             colorScheme="teal"
                             variant="solid"
                             isLoading={isAdding || isRemoving}
+                            display={isDashboardCard ? { base: "none", sm: "inline-flex" } : "inline-flex"}
                         >
                             Manage Lists...
                         </MenuButton>
@@ -272,6 +359,7 @@ const GameCard = ({ game, variant = "grid" }) => {
                         colorScheme="whiteAlpha"
                         leftIcon={<Icon as={FaLock} boxSize={3} />}
                         _hover={{ bg: "whiteAlpha.200" }}
+                        display={isDashboardCard ? { base: "none", sm: "inline-flex" } : "inline-flex"}
                     >
                         Login to Add
                     </Button>

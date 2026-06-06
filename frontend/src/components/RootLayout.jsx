@@ -384,7 +384,7 @@ export function RootLayout() {
             </Drawer>
 
             {/* --- Main Content Area --- */}
-            <Box p="4" flex="1">
+            <Box p={{ base: 2, sm: 4 }} flex="1">
                 <Outlet />
             </Box>
         </Flex>

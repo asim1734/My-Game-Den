@@ -94,20 +94,20 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
     const skeletons = Array(10).fill(0);
 
     return (
-        <Box my={{ base: 6, md: 8 }}>
+        <Box my={{ base: 4, md: 8 }}>
             <Flex
                 justify="space-between"
-                align={{ base: "flex-start", sm: "flex-end" }}
-                direction={{ base: "column", sm: "row" }}
+                align="flex-end"
+                direction="row"
                 gap={{ base: 2, sm: 3 }}
-                mb={4}
+                mb={{ base: 2.5, md: 4 }}
             >
-                <Box>
-                    <Heading size="md" color="white">
+                <Box minW={0}>
+                    <Heading size={{ base: "sm", sm: "md" }} color="white" noOfLines={1}>
                         {title}
                     </Heading>
                     {subtitle && (
-                        <Text fontSize="sm" color="gray.500" mt={0.5}>
+                        <Text fontSize={{ base: "xs", sm: "sm" }} color="gray.500" mt={0.5} noOfLines={1}>
                             {subtitle}
                         </Text>
                     )}
@@ -121,7 +121,6 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
                         colorScheme="purple"
                         rightIcon={<FaArrowRight />}
                         flexShrink={0}
-                        alignSelf={{ base: "flex-start", sm: "auto" }}
                     >
                         View All
                     </Button>
@@ -131,16 +130,50 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             {isLoading && (
                 <Box
                     overflowX="auto"
-                    pb={4}
+                    mx={{ base: "-4", sm: "-8", md: "-12" }}
+                    px={{ base: "4", sm: "8", md: "12" }}
+                    pb={{ base: 2, md: 4 }}
                     sx={{
-                        "&::-webkit-scrollbar": { height: "8px" },
+                        "&::-webkit-scrollbar": { height: "6px" },
+                        "&::-webkit-scrollbar-track": {
+                            background: "transparent",
+                            borderLeftWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderLeftStyle: "solid",
+                            borderLeftColor: "transparent",
+                            borderRightWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderRightStyle: "solid",
+                            borderRightColor: "transparent",
+                        },
                         "&::-webkit-scrollbar-thumb": {
                             background: "var(--chakra-colors-brand-700)",
+                            backgroundClip: "padding-box",
                             borderRadius: "24px",
+                            borderLeftWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderLeftStyle: "solid",
+                            borderLeftColor: "transparent",
+                            borderRightWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderRightStyle: "solid",
+                            borderRightColor: "transparent",
                         },
                     }}
                 >
-                    <Flex gap={{ base: 3, md: 4 }} flexWrap="nowrap" pr={1}>
+                    <Flex gap={{ base: 2, md: 4 }} flexWrap="nowrap" pr={{ base: 4, sm: 8, md: 12 }}>
                         {skeletons.map((_, index) => (
                             <GameCardSkeleton key={index} variant="dashboard" />
                         ))}
@@ -159,16 +192,50 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             {games && (
                 <Box
                     overflowX="auto"
-                    pb={4}
+                    mx={{ base: "-4", sm: "-8", md: "-12" }}
+                    px={{ base: "4", sm: "8", md: "12" }}
+                    pb={{ base: 2, md: 4 }}
                     sx={{
-                        "&::-webkit-scrollbar": { height: "8px" },
+                        "&::-webkit-scrollbar": { height: "6px" },
+                        "&::-webkit-scrollbar-track": {
+                            background: "transparent",
+                            borderLeftWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderLeftStyle: "solid",
+                            borderLeftColor: "transparent",
+                            borderRightWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderRightStyle: "solid",
+                            borderRightColor: "transparent",
+                        },
                         "&::-webkit-scrollbar-thumb": {
                             background: "var(--chakra-colors-brand-700)",
+                            backgroundClip: "padding-box",
                             borderRadius: "24px",
+                            borderLeftWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderLeftStyle: "solid",
+                            borderLeftColor: "transparent",
+                            borderRightWidth: {
+                                base: "16px",
+                                sm: "32px",
+                                md: "48px",
+                            },
+                            borderRightStyle: "solid",
+                            borderRightColor: "transparent",
                         },
                     }}
                 >
-                    <Flex gap={{ base: 3, md: 4 }} flexWrap="nowrap" pr={1}>
+                    <Flex gap={{ base: 2, md: 4 }} flexWrap="nowrap" pr={{ base: 4, sm: 8, md: 12 }}>
                         {games.map((game) => (
                             <GameCard
                                 key={game.igdbId}
@@ -205,22 +272,22 @@ const PersonalizedSection = () => {
     const hasCollections = collections && collections.length > 0;
 
     return (
-        <Box my={{ base: 6, md: 8 }}>
+        <Box my={{ base: 4, md: 8 }}>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 4, md: 6 }}>
                 {/* --- Collections Column --- */}
                 <Box>
                     <Flex
                         justify="space-between"
-                        align={{ base: "flex-start", sm: "flex-end" }}
-                        direction={{ base: "column", sm: "row" }}
+                        align="flex-end"
+                        direction="row"
                         gap={{ base: 2, sm: 3 }}
                         mb={3}
                     >
-                        <Box>
-                            <Heading size="sm" color="white">
+                        <Box minW={0}>
+                            <Heading size="sm" color="white" noOfLines={1}>
                                 Your Collections
                             </Heading>
-                            <Text fontSize="xs" color="gray.500" mt={0.5}>
+                            <Text fontSize="xs" color="gray.500" mt={0.5} noOfLines={1}>
                                 Jump back in
                             </Text>
                         </Box>
@@ -232,7 +299,6 @@ const PersonalizedSection = () => {
                             colorScheme="purple"
                             rightIcon={<FaArrowRight />}
                             flexShrink={0}
-                            alignSelf={{ base: "flex-start", sm: "auto" }}
                         >
                             View All
                         </Button>
@@ -272,7 +338,7 @@ const PersonalizedSection = () => {
                                     to={`/collections/${encodeURIComponent(col.name)}`}
                                     bg="brand.800"
                                     borderRadius="lg"
-                                    p={3}
+                                    p={{ base: 2.5, sm: 3 }}
                                     align="center"
                                     justify="space-between"
                                     border="1px solid"
@@ -320,16 +386,16 @@ const PersonalizedSection = () => {
                 <Box>
                     <Flex
                         justify="space-between"
-                        align={{ base: "flex-start", sm: "flex-end" }}
-                        direction={{ base: "column", sm: "row" }}
+                        align="flex-end"
+                        direction="row"
                         gap={{ base: 2, sm: 3 }}
                         mb={3}
                     >
-                        <Box>
-                            <Heading size="sm" color="white">
+                        <Box minW={0}>
+                            <Heading size="sm" color="white" noOfLines={1}>
                                 Your Tier Lists
                             </Heading>
-                            <Text fontSize="xs" color="gray.500" mt={0.5}>
+                            <Text fontSize="xs" color="gray.500" mt={0.5} noOfLines={1}>
                                 Pick up where you left off
                             </Text>
                         </Box>
@@ -341,7 +407,6 @@ const PersonalizedSection = () => {
                             colorScheme="purple"
                             rightIcon={<FaArrowRight />}
                             flexShrink={0}
-                            alignSelf={{ base: "flex-start", sm: "auto" }}
                         >
                             View All
                         </Button>
@@ -379,11 +444,11 @@ const PersonalizedSection = () => {
                                     key={list._id}
                                     bg="brand.800"
                                     borderRadius="lg"
-                                    p={3}
-                                    align={{ base: "stretch", sm: "center" }}
+                                    p={{ base: 2.5, sm: 3 }}
+                                    align="center"
                                     justify="space-between"
-                                    direction={{ base: "column", sm: "row" }}
-                                    gap={{ base: 2, sm: 0 }}
+                                    direction="row"
+                                    gap={2}
                                     border="1px solid"
                                     borderColor="brand.700"
                                     _hover={{ borderColor: "purple.600" }}
@@ -431,8 +496,7 @@ const PersonalizedSection = () => {
                                         colorScheme="purple"
                                         variant="ghost"
                                         flexShrink={0}
-                                        w={{ base: "100%", sm: "auto" }}
-                                        ml={{ base: 0, sm: 2 }}
+                                        ml={2}
                                     >
                                         Continue
                                     </Button>
@@ -451,7 +515,7 @@ export const DashboardPage = () => {
     const isLoggedIn = !!localStorage.getItem("x-auth-token");
 
     return (
-        <Box p={{ base: 3, sm: 4, md: 8 }} maxW="1600px" mx="auto">
+        <Box p={{ base: 2, sm: 4, md: 8 }} maxW="1600px" mx="auto">
             <GenreStrip />
 
             <GameRow
