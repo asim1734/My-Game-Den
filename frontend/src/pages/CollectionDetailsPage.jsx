@@ -93,12 +93,12 @@ export const CollectionDetailsPage = () => {
             {/* Content Grid */}
             {isLoading ? (
                 // FIX: Adjusted columns to make cards wider on typical screens
-                <SimpleGrid columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }} spacing={{ base: 2.5, sm: 4, md: 6 }}>
+                <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }} spacing={{ base: 2.5, sm: 4, md: 6 }}>
                     {Array(10).fill(0).map((_, i) => <GameCardSkeleton key={i} />)}
                 </SimpleGrid>
             ) : listGames && listGames.length > 0 ? (
                 // FIX: Matches the layout above
-                <SimpleGrid columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }} spacing={{ base: 2.5, sm: 4, md: 6 }}>
+                <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }} spacing={{ base: 2.5, sm: 4, md: 6 }}>
                     {listGames.map((game) => (
                         <GameCard 
                             key={game.igdbId} 

@@ -130,24 +130,24 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             {isLoading && (
                 <Box
                     overflowX="auto"
-                    mx={{ base: "-4", sm: "-8", md: "-12" }}
-                    px={{ base: "4", sm: "8", md: "12" }}
+                    mx={{ base: -2, sm: -4, md: -8 }}
+                    px={{ base: 2, sm: 4, md: 8 }}
                     pb={{ base: 2, md: 4 }}
                     sx={{
                         "&::-webkit-scrollbar": { height: "6px" },
                         "&::-webkit-scrollbar-track": {
                             background: "transparent",
                             borderLeftWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderLeftStyle: "solid",
                             borderLeftColor: "transparent",
                             borderRightWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderRightStyle: "solid",
                             borderRightColor: "transparent",
@@ -157,16 +157,16 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
                             backgroundClip: "padding-box",
                             borderRadius: "24px",
                             borderLeftWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderLeftStyle: "solid",
                             borderLeftColor: "transparent",
                             borderRightWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderRightStyle: "solid",
                             borderRightColor: "transparent",
@@ -192,24 +192,24 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
             {games && (
                 <Box
                     overflowX="auto"
-                    mx={{ base: "-4", sm: "-8", md: "-12" }}
-                    px={{ base: "4", sm: "8", md: "12" }}
+                    mx={{ base: -2, sm: -4, md: -8 }}
+                    px={{ base: 2, sm: 4, md: 8 }}
                     pb={{ base: 2, md: 4 }}
                     sx={{
                         "&::-webkit-scrollbar": { height: "6px" },
                         "&::-webkit-scrollbar-track": {
                             background: "transparent",
                             borderLeftWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderLeftStyle: "solid",
                             borderLeftColor: "transparent",
                             borderRightWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderRightStyle: "solid",
                             borderRightColor: "transparent",
@@ -219,16 +219,16 @@ const GameRow = ({ title, subtitle, queryKey, fetcher, viewAllHref }) => {
                             backgroundClip: "padding-box",
                             borderRadius: "24px",
                             borderLeftWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderLeftStyle: "solid",
                             borderLeftColor: "transparent",
                             borderRightWidth: {
-                                base: "16px",
-                                sm: "32px",
-                                md: "48px",
+                                base: "8px",
+                                sm: "16px",
+                                md: "32px",
                             },
                             borderRightStyle: "solid",
                             borderRightColor: "transparent",

@@ -44,7 +44,7 @@ export const UserListPage = () => {
             <Box p={{ base: 2, sm: 4, md: 6 }}>
                 <Heading mb={6}>My {capitalize(listName)}</Heading>
                 <SimpleGrid
-                    columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }}
+                    columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
                     spacing={{ base: 2.5, sm: 4, md: 6 }}
                 >
                     {skeletons.map((_, index) => (
@@ -71,7 +71,7 @@ export const UserListPage = () => {
 
             {listGames && listGames.length > 0 ? (
                 <SimpleGrid
-                    columns={{ base: 3, sm: 3, md: 4, lg: 5, xl: 6 }}
+                    columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
                     spacing={{ base: 2.5, sm: 4, md: 6 }}
                 >
                     {listGames.map((game) => (

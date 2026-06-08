@@ -58,13 +58,13 @@ export const FilterSidebar = ({ filters, onFilterChange, onClearAll }) => {
         <VStack
             spacing={6}
             align="stretch"
-            position="sticky"
-            top="100px"
-            h="calc(100vh - 120px)"
-            overflowY="auto"
+            position={{ base: "static", lg: "sticky" }}
+            top={{ base: "0", lg: "100px" }}
+            h={{ base: "auto", lg: "calc(100vh - 120px)" }}
+            overflowY={{ base: "visible", lg: "auto" }}
             p={4}
             pb={6}
-            borderRightWidth="1px"
+            borderRightWidth={{ base: "0", lg: "1px" }}
             borderColor="gray.700"
         >
             <Heading size="md" mb={2}>

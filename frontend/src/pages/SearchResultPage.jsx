@@ -60,7 +60,7 @@ export const SearchResultsPage = () => {
             </Flex>
 
             {isLoading ? (
-                <SimpleGrid columns={{ base: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
+                <SimpleGrid columns={{ base: 2, sm: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
                     {Array.from({ length: 8 }).map((_, i) => (
                         <GameCardSkeleton key={i} />
                     ))}
@@ -73,7 +73,7 @@ export const SearchResultsPage = () => {
                 </Center>
             ) : games?.length > 0 ? (
                 <>
-                    <SimpleGrid columns={{ base: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
+                    <SimpleGrid columns={{ base: 2, sm: 3, md: 4, xl: 5 }} spacing={{ base: 3, md: 6 }}>
                         {games.map((game) => (
                             <GameCard key={game.igdbId} game={game} />
                         ))}

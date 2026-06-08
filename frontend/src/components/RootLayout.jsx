@@ -103,7 +103,8 @@ export function RootLayout() {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === "k") {
                 e.preventDefault();
-                document.getElementById("global-search")?.focus();
+                const searchEl = document.getElementById("global-search") || document.getElementById("global-search-mobile");
+                searchEl?.focus();
             }
         };
         window.addEventListener("keydown", handleKeyDown);
@@ -125,118 +126,120 @@ export function RootLayout() {
     return (
         <Flex direction="column" minHeight="100vh">
             {/* --- Sticky Navbar --- */}
-            <Flex
+            <Box
                 as="nav"
-                px={{ base: 4, md: 6 }}
-                py={3}
-                bg="brand.800"
-                align="center"
                 position="sticky"
                 top="0"
                 zIndex="sticky"
+                bg="brand.800"
                 borderBottom="1px solid"
                 borderColor="brand.700"
-                gap={{ base: 2, sm: 4 }}
             >
-                {/* Mobile hamburger */}
-                <IconButton
-                    icon={<FaBars />}
-                    variant="ghost"
-                    size="sm"
-                    display={{ base: "flex", md: "none" }}
-                    onClick={onOpen}
-                    aria-label="Open menu"
-                />
-
-                {/* Logo */}
-                <Box
-                    as={RouterLink}
-                    to="/"
-                    transition="opacity 0.2s"
-                    _hover={{ opacity: 0.8 }}
-                    flexShrink={0}
+                {/* Primary Row: hamburger, logo, search (desktop only), spacer, actions */}
+                <Flex
+                    px={{ base: 4, md: 6 }}
+                    py={3}
+                    align="center"
+                    gap={{ base: 2, sm: 4 }}
                 >
-                    <Image
-                        src="/MyGameDenLogo.png"
-                        alt="My Game Den"
-                        h={{ base: "40px", md: "50px" }}
-                        cursor="pointer"
+                    {/* Mobile hamburger */}
+                    <IconButton
+                        icon={<FaBars />}
+                        variant="ghost"
+                        size="sm"
+                        display={{ base: "flex", md: "none" }}
+                        onClick={onOpen}
+                        aria-label="Open menu"
                     />
-                </Box>
 
-                {/* Desktop nav links */}
-                <HStack spacing={1} display={{ base: "none", md: "flex" }}>
-                    <NavLink to="/" icon={<FaHome size="14px" />}>
-                        Home
-                    </NavLink>
-                    <NavLink to="/browse" icon={<FaCompass size="14px" />}>
-                        Browse
-                    </NavLink>
-                    {isAuthenticated && (
-                        <NavLink
-                            to="/library"
-                            icon={<FaBookmark size="14px" />}
-                        >
-                            Library
-                        </NavLink>
-                    )}
-                </HStack>
-
-                <Spacer />
-
-                {/* Search bar */}
-                <InputGroup
-                    size="sm"
-                    w={{
-                        base: searchFocused ? "180px" : "150px",
-                        sm: searchFocused ? "300px" : "200px",
-                        md: searchFocused ? "400px" : "300px",
-                    }}
-                    transition="width 0.2s"
-                >
-                    <InputLeftElement pointerEvents="none">
-                        <FaSearch color="gray.500" size="12px" />
-                    </InputLeftElement>
-                    <Input
-                        id="global-search"
-                        placeholder="Search games..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onFocus={() => setSearchFocused(true)}
-                        onBlur={() => setSearchFocused(false)}
-                        variant="filled"
-                        bg="brand.900"
-                        color="white"
-                        _hover={{ bg: "brand.700" }}
-                        _focus={{
-                            bg: "brand.700",
-                            borderColor: "purple.500",
-                        }}
-                        borderRadius="md"
-                    />
-                    <HStack
-                        position="absolute"
-                        right={2}
-                        top="50%"
-                        transform="translateY(-50%)"
-                        pointerEvents="none"
-                        display={{ base: "none", md: "flex" }}
-                        opacity={searchFocused ? 0 : 0.5}
+                    {/* Logo */}
+                    <Box
+                        as={RouterLink}
+                        to="/"
                         transition="opacity 0.2s"
+                        _hover={{ opacity: 0.8 }}
+                        flexShrink={0}
                     >
-                        <Kbd fontSize="xs" bg="whiteAlpha.200" color="gray.500">
-                            Ctrl
-                        </Kbd>
-                        <Kbd fontSize="xs" bg="whiteAlpha.200" color="gray.500">
-                            K
-                        </Kbd>
+                        <Image
+                            src="/MyGameDenLogo.png"
+                            alt="My Game Den"
+                            h={{ base: "32px", sm: "40px", md: "50px" }}
+                            cursor="pointer"
+                        />
+                    </Box>
+
+                    {/* Desktop nav links */}
+                    <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+                        <NavLink to="/" icon={<FaHome size="14px" />}>
+                            Home
+                        </NavLink>
+                        <NavLink to="/browse" icon={<FaCompass size="14px" />}>
+                            Browse
+                        </NavLink>
+                        {isAuthenticated && (
+                            <NavLink
+                                to="/library"
+                                icon={<FaBookmark size="14px" />}
+                            >
+                                Library
+                            </NavLink>
+                        )}
                     </HStack>
-                </InputGroup>
 
-                <Spacer />
+                    <Spacer display={{ base: "none", md: "block" }} />
 
-                {/* Right side actions */}
-                <HStack spacing={2}>
+                    {/* Search bar - Desktop Only */}
+                    <InputGroup
+                        size="sm"
+                        w={{
+                            md: searchFocused ? "400px" : "300px",
+                        }}
+                        display={{ base: "none", md: "flex" }}
+                        transition="width 0.2s"
+                    >
+                        <InputLeftElement pointerEvents="none">
+                            <FaSearch color="gray.500" size="12px" />
+                        </InputLeftElement>
+                        <Input
+                            id="global-search"
+                            placeholder="Search games..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onFocus={() => setSearchFocused(true)}
+                            onBlur={() => setSearchFocused(false)}
+                            variant="filled"
+                            bg="brand.900"
+                            color="white"
+                            _hover={{ bg: "brand.700" }}
+                            _focus={{
+                                bg: "brand.700",
+                                borderColor: "purple.500",
+                            }}
+                            borderRadius="md"
+                        />
+                        <HStack
+                            position="absolute"
+                            right={2}
+                            top="50%"
+                            transform="translateY(-50%)"
+                            pointerEvents="none"
+                            display={{ base: "none", md: "flex" }}
+                            opacity={searchFocused ? 0 : 0.5}
+                            transition="opacity 0.2s"
+                        >
+                            <Kbd fontSize="xs" bg="whiteAlpha.200" color="gray.500">
+                                Ctrl
+                            </Kbd>
+                            <Kbd fontSize="xs" bg="whiteAlpha.200" color="gray.500">
+                                K
+                            </Kbd>
+                        </HStack>
+                    </InputGroup>
+
+                    <Spacer />
+
+                    {/* Right side actions */}
+                    <HStack spacing={2}>
                     {isAuthenticated ? (
                         <>
                             {/* User menu */}
@@ -326,6 +329,35 @@ export function RootLayout() {
                     )}
                 </HStack>
             </Flex>
+
+            {/* Bottom Row: Search Bar - ONLY on mobile/tablet (below md) */}
+            <Box
+                display={{ base: "block", md: "none" }}
+                px={4}
+                pb={3}
+            >
+                <InputGroup size="sm" w="100%">
+                    <InputLeftElement pointerEvents="none">
+                        <FaSearch color="gray.500" size="12px" />
+                    </InputLeftElement>
+                    <Input
+                        id="global-search-mobile"
+                        placeholder="Search games..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        variant="filled"
+                        bg="brand.900"
+                        color="white"
+                        _hover={{ bg: "brand.700" }}
+                        _focus={{
+                            bg: "brand.700",
+                            borderColor: "purple.500",
+                        }}
+                        borderRadius="md"
+                    />
+                </InputGroup>
+            </Box>
+        </Box>
 
             {/* Mobile drawer */}
             <Drawer isOpen={isOpen} placement="left" onClose={onClose}>

@@ -123,12 +123,12 @@ export const TierListEditorPage = () => {
             onDragEnd={handleDragEnd}
         >
             <Flex
-                h="calc(100vh - 64px)"
+                h={{ base: "calc(100vh - 100px)", md: "calc(100vh - 74px)" }}
                 overflow="hidden"
                 bg="brand.900"
-                mx={{ base: 0, md: -4 }}
-                mt={{ base: 0, md: -4 }}
-                mb={{ base: 0, md: -4 }}
+                mx={{ base: -2, md: -4 }}
+                mt={{ base: -2, md: -4 }}
+                mb={{ base: -2, md: -4 }}
                 w="auto"
             >
                 {/* LEFT: Editor Area */}

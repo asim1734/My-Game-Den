@@ -70,7 +70,7 @@ export const TierGameCard = ({ game, onRemove, onClick, variant = "board" }) => 
                         right={0}
                         colorScheme="red"
                         variant="solid"
-                        opacity={0}
+                        opacity={{ base: 1, md: 0 }}
                         _groupHover={{ opacity: 1 }}
                         onClick={(e) => {
                             e.stopPropagation();
